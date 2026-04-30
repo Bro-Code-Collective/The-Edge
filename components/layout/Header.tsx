@@ -73,16 +73,6 @@ export const Header = () => {
             </Link>
           </div>
 
-          {/* Mobile Search (since main nav is at bottom) */}
-          <div className="flex md:hidden items-center gap-2">
-            <Link
-              href="/browse"
-              className="w-10 h-10 grid place-items-center rounded-full glass-dark hover:bg-secondary transition-smooth focus-dashed"
-              aria-label="Search"
-            >
-              <Search className="w-5 h-5" />
-            </Link>
-          </div>
         </div>
       </div>
     </header>

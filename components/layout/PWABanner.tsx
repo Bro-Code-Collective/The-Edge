@@ -9,7 +9,7 @@ export const PWABanner = () => {
   if (dismissed) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-[340px] z-50 animate-slide-in-right">
+    <div className="fixed bottom-20 md:bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-[340px] z-50 animate-slide-in-right">
       <div className="bg-card border border-border rounded-3xl p-4 shadow-elevated flex items-start gap-3">
         <div className="w-10 h-10 rounded-2xl hero-gradient grid place-items-center text-white shrink-0">
           <Smartphone className="w-5 h-5" />

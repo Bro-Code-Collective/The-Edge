@@ -223,3 +223,14 @@
     padding-top: env(safe-area-inset-top);
   }
 }
+
+/* Push sonner toasts above bottom nav on mobile */
+[data-sonner-toaster][data-position^="bottom"] {
+  --offset: 20px;
+}
+
+@media (max-width: 768px) {
+  [data-sonner-toaster][data-position^="bottom"] {
+    --offset: 80px !important;
+  }
+}
