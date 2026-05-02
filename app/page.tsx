@@ -11,6 +11,7 @@ import { FoodCard } from "@/components/shop/FoodCard";
 import { useMenuItems, useShops } from "@/lib/supabase/hooks";
 import { useCart } from "@/store/cart";
 import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
+import { useProfile } from "@/store/profile";
 
 export default function HomePage() {
   const [query, setQuery] = useState("");
@@ -18,6 +19,14 @@ export default function HomePage() {
   const { data: shops = [] } = useShops();
   const { data: items = [] } = useMenuItems();
   const { favorites } = useCart();
+  const { name } = useProfile();
+
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning,";
+    if (hour < 17) return "Good Afternoon,";
+    return "Good Evening,";
+  }, []);
 
   const shopNames = useMemo(
     () => new Map(shops.map((shop) => [shop.id, shop.name])),
@@ -33,7 +42,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden pt-6 pb-2 md:pt-12 md:pb-8 bg-gradient-to-b from-[#eaf8e3] to-background dark:from-[#1a2e1d] dark:to-background">
+      <section className="relative overflow-hidden pt-6 pb-2 md:pt-28 md:pb-8 bg-gradient-to-b from-[#eaf8e3] to-background dark:from-[#1a2e1d] dark:to-background">
         <div className="container mx-auto px-4">
           <div className="animate-fade-up">
             {/* Profile Greeting */}
@@ -42,8 +51,8 @@ export default function HomePage() {
                 <ProfileAvatar className="w-full h-full" iconSize={24} />
               </Link>
               <div>
-                <div className="text-[13px] text-muted-foreground font-medium">Good Morning,</div>
-                <div className="text-lg font-semibold leading-tight text-foreground">Samantha</div>
+                <div className="text-[13px] text-muted-foreground font-medium">{greeting}</div>
+                <div className="text-lg font-semibold leading-tight text-foreground">{name.split(' ')[0]}</div>
               </div>
             </div>
 

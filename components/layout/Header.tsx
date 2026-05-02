@@ -12,9 +12,19 @@ export const Header = () => {
   const count = useCart((s) => s.count());
   const pathname = usePathname();
   const [mounted, setMounted] = React.useState(false);
+  const [scrolled, setScrolled] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
+    
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navLinks = [
@@ -24,7 +34,13 @@ export const Header = () => {
   ];
 
   return (
-    <header className="hidden md:block sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/60">
+    <header 
+      className={`hidden md:block fixed w-full top-0 z-40 transition-all duration-300 ${
+        scrolled 
+          ? "bg-background/80 backdrop-blur-xl border-b border-border/60" 
+          : "bg-transparent border-transparent"
+      }`}
+    >
       <div className="container mx-auto px-4 flex items-center justify-between h-16">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group" id="header-logo">
