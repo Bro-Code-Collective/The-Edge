@@ -46,7 +46,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
   }, [pathname, router, isLoginPage, isSignupPage, isRegistrationPage, isVendorPage, isAuthPage]);
   
   const hideNav = isLoginPage || isSignupPage || isRegistrationPage || isVendorPage || isAuthPage;
-  const showFooter = pathname === "/" || pathname === "/profile";
+  const showFooter = pathname === "/profile";
 
   if (loading && !hideNav) {
     return <div className="flex-1 bg-background" />;
