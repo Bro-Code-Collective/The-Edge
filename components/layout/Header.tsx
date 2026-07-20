@@ -86,7 +86,7 @@ export const Header = () => {
             </Link>
             <Link
               href="/profile"
-              className="w-10 h-10 overflow-hidden hover:opacity-80 transition-smooth focus-dashed flex items-center justify-center"
+              className="w-7 h-7 overflow-hidden hover:opacity-80 transition-smooth focus-dashed flex items-center justify-center"
               aria-label="Profile"
             >
               <ProfileAvatar className="w-full h-full" iconSize={20} />

@@ -13,13 +13,13 @@ export function ProfileAvatar({ className = "", iconSize = 20 }: { className?: s
       className={`relative flex items-center justify-center profile-avatar overflow-hidden ${className}`}
     >
       <Image
-        src="/images/profile-icon-black.png"
+        src="/images/profile-black.svg"
         alt="Profile"
         fill
         className="object-cover dark:hidden"
       />
       <Image
-        src="/images/profile-icon-white.png"
+        src="/images/profile-white.svg"
         alt="Profile"
         fill
         className="object-cover hidden dark:block"

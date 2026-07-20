@@ -47,7 +47,7 @@ export default function HomePage() {
           <div className="animate-fade-up">
             {/* Profile Greeting */}
             <div className="flex items-center gap-3 mb-8 md:hidden">
-              <Link href="/profile" className="w-12 h-12 overflow-hidden hover:opacity-80 transition-smooth focus-dashed flex items-center justify-center">
+              <Link href="/profile" className="w-8 h-8 overflow-hidden hover:opacity-80 transition-smooth focus-dashed flex items-center justify-center">
                 <ProfileAvatar className="w-full h-full" iconSize={24} />
               </Link>
               <div>
