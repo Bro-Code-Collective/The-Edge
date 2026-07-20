@@ -30,7 +30,7 @@ export default function CartPage() {
           </p>
           <Link
             href="/browse"
-            className="inline-flex mt-8 pill bg-foreground text-background px-10 py-4 font-bold focus-dashed hover:bg-foreground/90 transition-smooth shadow-pop"
+            className="inline-flex mt-8 pill bg-foreground text-background px-6 py-2.5 text-sm font-bold focus-dashed hover:bg-foreground/90 transition-smooth shadow-pop"
           >
             Start shopping
           </Link>
