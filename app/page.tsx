@@ -9,8 +9,8 @@ import { ShopCard } from "@/components/shop/ShopCard";
 import { FoodCard } from "@/components/shop/FoodCard";
 import { useMenuItems, useShops } from "@/lib/supabase/hooks";
 import { useCart } from "@/store/cart";
-import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { useProfile } from "@/store/profile";
+import { NotificationLink } from "@/components/layout/NotificationLink";
 
 export default function HomePage() {
   const [query, setQuery] = useState("");
@@ -46,14 +46,12 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="animate-fade-up">
             {/* Profile Greeting */}
-            <div className="flex items-center gap-3 mb-8 md:hidden">
-              <Link href="/profile" className="w-12 h-12 rounded-full overflow-hidden border border-border shadow-sm hover:opacity-80 transition-smooth focus-dashed">
-                <ProfileAvatar className="w-full h-full" iconSize={24} />
-              </Link>
+            <div className="flex items-center justify-between mb-8 md:hidden">
               <div>
                 <div className="text-[13px] text-muted-foreground font-medium">{greeting}</div>
                 <div className="text-lg font-semibold leading-tight text-foreground">{name.split(' ')[0]}</div>
               </div>
+              <NotificationLink className="w-7 h-7 hover:opacity-80" iconClassName="w-6 h-6" />
             </div>
 
             {/* Main Headline */}
@@ -65,7 +63,7 @@ export default function HomePage() {
             {/* Vendors Section */}
             <div className="mb-4 flex items-center gap-3 text-sm text-muted-foreground">
               <div className="flex -space-x-2">
-                {shops.length > 0 ? shops.slice(0, 5).map((s, idx) => (
+                {shops.length > 0 ? shops.filter(s => s.isOpen).slice(0, 5).map((s, idx) => (
                   <div
                     key={s.id || idx}
                     className="w-8 h-8 rounded-full bg-secondary border-2 border-background grid place-items-center text-sm shadow-sm relative z-10"
@@ -82,7 +80,7 @@ export default function HomePage() {
                 ))}
               </div>
               <span>
-                <span className="font-semibold text-foreground">{shops.length > 0 ? shops.length : 5} vendors</span> serving the campus
+                <span className="font-semibold text-foreground">{shops.length > 0 ? shops.filter(s => s.isOpen).length : 5} vendors</span> serving today
               </span>
             </div>
           </div>
@@ -103,7 +101,10 @@ export default function HomePage() {
               }
             }}
             placeholder="Search food, drinks, or shops…"
-            className="w-full pl-12 pr-5 py-4 rounded-full bg-secondary border border-transparent focus:border-primary focus:bg-background transition-smooth focus-dashed text-sm placeholder:text-muted-foreground outline-none"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck="false"
+            className="w-full pl-12 pr-5 py-4 rounded-full bg-secondary border border-transparent focus:border-black dark:focus:border-white focus:bg-background transition-smooth focus-dashed text-sm placeholder:text-muted-foreground outline-none"
           />
         </div>
       </section>

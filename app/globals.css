@@ -128,6 +128,20 @@
     font-feature-settings: "kern" 1, "ss01" 1, "cv11" 1;
   }
 
+  ::selection {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  img::selection {
+    background: hsl(var(--primary));
+  }
+
+  img {
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -206,13 +220,11 @@
   }
 
   .profile-avatar {
-    background-color: hsl(220 14% 90%);
-    color: hsl(220 9% 46%);
+    background-color: transparent;
   }
 
   .dark .profile-avatar {
-    background-color: hsl(222 20% 18%);
-    color: hsl(220 10% 65%);
+    background-color: transparent;
   }
 
   .scrollbar-hide::-webkit-scrollbar { display: none; }
