@@ -26,6 +26,10 @@ export const FoodCard = ({ item, compact = false, shopName }: FoodCardProps) => 
   const fav = optimisticFav ?? serverFav;
   const { data: shop } = useShopById(item.shopId);
   const isInCart = items.some((cartItem) => cartItem.item.id === item.id);
+  const dietLabel = item.dietaryTags.find((tag) => {
+    const normalized = tag.toLowerCase();
+    return normalized === "vegan" || normalized === "vegetarian";
+  });
 
   useEffect(() => {
     setOptimisticFav(null);
@@ -98,6 +102,11 @@ export const FoodCard = ({ item, compact = false, shopName }: FoodCardProps) => 
             </div>
             {(shopName || shop) && (
               <p className="text-sm text-muted-foreground mt-0.5 truncate">{shopName ?? shop?.name}</p>
+            )}
+            {dietLabel && (
+              <span className="mt-2 inline-flex w-fit rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300">
+                {dietLabel}
+              </span>
             )}
           </div>
 
