@@ -59,7 +59,7 @@ export default function HomePage() {
             {/* Main Headline */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight leading-[1.1] mb-6">
               Feeling hungry?<br />
-              What are we cookin&apos; today?
+              Order ahead. Skip the queue.
             </h1>
 
             {/* Vendors Section */}
