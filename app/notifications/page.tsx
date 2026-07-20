@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Clock, ArrowRight } from "lucide-react";
 import { useMemo } from "react";
@@ -73,8 +72,8 @@ export default function NotificationsPage() {
         <div className="flex-1 container mx-auto px-4 py-20 md:pt-36 text-center">
           <div className="w-24 h-24 bg-secondary/50 rounded-full flex items-center justify-center mx-auto mb-6">
             <div className="relative w-10 h-10">
-              <Image src="/icons/notification-black.svg" alt="" fill className="dark:hidden object-contain" />
-              <Image src="/icons/notification-white.svg" alt="" fill className="hidden dark:block object-contain" />
+              <img src="/icons/notification-black.svg" alt="" className="w-full h-full dark:hidden object-contain" loading="eager" decoding="sync" />
+              <img src="/icons/notification-white.svg" alt="" className="hidden w-full h-full dark:block object-contain" loading="eager" decoding="sync" />
             </div>
           </div>
           <h1 className="text-3xl font-bold tracking-tight">No notifications yet</h1>
@@ -83,7 +82,7 @@ export default function NotificationsPage() {
           </p>
           <Link
             href="/browse"
-            className="inline-flex mt-8 pill bg-foreground text-background px-6 py-2.5 text-sm font-bold focus-dashed hover:bg-foreground/90 transition-smooth shadow-pop"
+            className="inline-flex mt-8 pill bg-foreground text-background px-6 py-2.5 text-sm font-bold focus-dashed hover:bg-foreground/90 transition-colors"
           >
             Start shopping
           </Link>
@@ -111,7 +110,7 @@ export default function NotificationsPage() {
                   <Link
                     key={order.id}
                     href={`/order/${encodeURIComponent(order.referenceNumber)}`}
-                    className="flex items-center justify-between gap-4 rounded-3xl border border-border bg-card p-5 shadow-soft transition-smooth hover:border-muted-foreground/50 focus-dashed"
+                    className="flex items-center justify-between gap-4 rounded-3xl border border-border bg-card p-5 transition-colors hover:border-muted-foreground/50 focus-dashed"
                   >
                     <div className="flex items-center gap-4 min-w-0">
                       <div className="w-12 h-12 rounded-xl bg-secondary grid place-items-center shrink-0">
