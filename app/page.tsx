@@ -65,7 +65,7 @@ export default function HomePage() {
             {/* Vendors Section */}
             <div className="mb-4 flex items-center gap-3 text-sm text-muted-foreground">
               <div className="flex -space-x-2">
-                {shops.length > 0 ? shops.slice(0, 5).map((s, idx) => (
+                {shops.length > 0 ? shops.filter(s => s.isOpen).slice(0, 5).map((s, idx) => (
                   <div
                     key={s.id || idx}
                     className="w-8 h-8 rounded-full bg-secondary border-2 border-background grid place-items-center text-sm shadow-sm relative z-10"
@@ -82,7 +82,7 @@ export default function HomePage() {
                 ))}
               </div>
               <span>
-                <span className="font-semibold text-foreground">{shops.length > 0 ? shops.length : 5} vendors</span> serving the campus
+                <span className="font-semibold text-foreground">{shops.length > 0 ? shops.filter(s => s.isOpen).length : 5} vendors</span> serving today
               </span>
             </div>
           </div>

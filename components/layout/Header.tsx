@@ -70,7 +70,7 @@ export const Header = () => {
             <Link
               href="/cart"
               id="header-cart-btn"
-              className="relative inline-flex items-center gap-2 pill bg-foreground text-background pl-4 pr-5 py-2 text-sm font-medium hover:bg-foreground/90 transition-smooth focus-dashed shadow-soft"
+              className="relative inline-flex items-center gap-2 text-muted-foreground hover:text-primary text-sm font-medium transition-smooth focus-dashed"
             >
               <ShoppingBag className="w-4 h-4" />
               <span>Cart</span>
