@@ -165,7 +165,7 @@ export function AuthLayout({ initialMode: propMode }: AuthLayoutProps) {
           </main>
 
           <footer className="flex justify-between items-center text-[10px] text-muted-foreground/40 mt-auto pt-8">
-            <p>© 2026 The Edge · All rights reserved</p>
+            
             <Link href="/vendor/login" className="hover:text-foreground transition-colors flex items-center gap-1 font-medium uppercase tracking-widest">
               Vendor sign in <ArrowRight className="w-3 h-3" />
             </Link>
