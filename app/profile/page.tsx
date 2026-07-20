@@ -187,7 +187,7 @@ export default function ProfilePage() {
                   </div>
                   <div>
                     <div className="font-bold text-[16px]">Dark Mode</div>
-                    <div className="text-[12px] text-muted-foreground font-medium">Simplify your night viewing</div>
+                  
                   </div>
                 </div>
                 <ThemeToggle />
