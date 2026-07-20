@@ -85,32 +85,7 @@ export default function VendorLoginPage() {
             {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-transparent to-black/40" />
             
-            {/* Floating Achievement/Status Card */}
-            <div className="absolute top-12 right-12">
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-                className="glass-light p-6 rounded-3xl shadow-2xl backdrop-blur-xl border border-white/20 text-white space-y-4 max-w-[240px]"
-              >
-                <div className="w-10 h-10 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
-                  <LayoutDashboard className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg leading-tight">Live Operations</h3>
-                  <p className="text-sm text-white/70 leading-relaxed mt-1">
-                    Your real-time command center for campus dining.
-                  </p>
-                </div>
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="h-1 flex-1 rounded-full bg-white/20 overflow-hidden">
-                      {i <= 3 && <div className="h-full w-full bg-primary" />}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </div>
+            {/* Removed Floating Achievement/Status Card per user request */}
 
             <div className="absolute bottom-16 left-16 right-16 text-white space-y-4">
               <motion.div
