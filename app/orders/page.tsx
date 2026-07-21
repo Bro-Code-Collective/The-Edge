@@ -3,18 +3,44 @@
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Clock, CheckCircle2, RotateCcw } from "lucide-react";
+import { ArrowRight, Clock, CheckCircle2, RotateCcw, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/store/cart";
 import { toast } from "sonner";
 import { displayReferenceNumber } from "@/lib/mockData";
 import { useUserOrders, useSupabaseUser } from "@/lib/supabase/hooks";
 
+type TimeFilter = "all" | "today" | "week" | "month";
+
+const timeFilters: { id: TimeFilter; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "today", label: "Today" },
+  { id: "week", label: "This week" },
+  { id: "month", label: "This month" },
+];
+
+function startOfDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function startOfWeek(date: Date) {
+  const start = startOfDay(date);
+  const day = start.getDay();
+  const diffToMonday = day === 0 ? 6 : day - 1;
+  start.setDate(start.getDate() - diffToMonday);
+  return start;
+}
+
+function startOfMonth(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
 export default function OrdersPage() {
   const { data: user } = useSupabaseUser();
   const { data: orders = [], isLoading } = useUserOrders(user?.id);
   const [visibleCount, setVisibleCount] = useState(5);
   const [clearedOrderIds, setClearedOrderIds] = useState<Set<string>>(new Set());
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("today");
   const { add } = useCart();
 
   useEffect(() => {
@@ -27,16 +53,45 @@ export default function OrdersPage() {
     setClearedOrderIds(new Set(saved ? JSON.parse(saved) : []));
   }, [user?.id]);
 
+  const persistClearedOrderIds = (ids: Set<string>) => {
+    setClearedOrderIds(ids);
+    if (user?.id) {
+      localStorage.setItem(`edge-cleared-orders-${user.id}`, JSON.stringify([...ids]));
+    }
+  };
+
+  const unclearedOrders = useMemo(
+    () => (orders || []).filter((o) => !clearedOrderIds.has(o.id)),
+    [orders, clearedOrderIds]
+  );
+
   const filteredOrders = useMemo(() => {
-    return (orders || []).filter((o) => !clearedOrderIds.has(o.id));
-  }, [orders, clearedOrderIds]);
+    if (timeFilter === "all") return unclearedOrders;
+
+    const now = new Date();
+    const todayStart = startOfDay(now);
+    const weekStart = startOfWeek(now);
+    const monthStart = startOfMonth(now);
+
+    return unclearedOrders.filter((o) => {
+      const orderDate = new Date(o.createdAt);
+      if (timeFilter === "today") return orderDate >= todayStart;
+      if (timeFilter === "week") return orderDate >= weekStart;
+      return orderDate >= monthStart;
+    });
+  }, [unclearedOrders, timeFilter]);
+
+  useEffect(() => {
+    setVisibleCount(5);
+  }, [timeFilter]);
 
   const visibleOrders = useMemo(() => filteredOrders.slice(0, visibleCount), [filteredOrders, visibleCount]);
   const totalSpend = useMemo(
     () => filteredOrders.reduce((sum, order) => sum + order.total, 0),
     [filteredOrders]
   );
-  const isEmpty = !isLoading && visibleOrders.length === 0;
+  const hasAnyOrders = unclearedOrders.length > 0;
+  const isEmpty = !isLoading && !hasAnyOrders;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,6 +126,14 @@ export default function OrdersPage() {
     toast.success("Items added to cart!");
   };
 
+  const handleClearHistory = () => {
+    persistClearedOrderIds(new Set([...clearedOrderIds, ...filteredOrders.map((o) => o.id)]));
+  };
+
+  const handleClearOne = (orderId: string) => {
+    persistClearedOrderIds(new Set([...clearedOrderIds, orderId]));
+  };
+
   return (
     <div className="flex-1 bg-background flex flex-col">
       <main
@@ -78,10 +141,39 @@ export default function OrdersPage() {
           isEmpty ? "py-20 md:pt-36" : "pt-8 pb-24 md:pb-32 md:pt-28"
         }`}
       >
-        {(!isLoading && visibleOrders.length > 0 || isLoading) && (
-          <div className="mb-8">
+        {(hasAnyOrders || isLoading) && (
+          <div className="mb-6">
             <h1 className="text-3xl font-bold tracking-tight mb-2">Order History</h1>
             <p className="text-muted-foreground">Track your current and past orders.</p>
+          </div>
+        )}
+
+        {hasAnyOrders && (
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              {timeFilters.map((f) => (
+                <button
+                  key={f.id}
+                  id={`orders-filter-${f.id}`}
+                  onClick={() => setTimeFilter(f.id)}
+                  className={`pill px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-smooth focus-dashed ${
+                    timeFilter === f.id
+                      ? "bg-foreground text-background"
+                      : "bg-secondary text-foreground hover:bg-accent"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            {filteredOrders.length > 0 && (
+              <button
+                onClick={handleClearHistory}
+                className="pill border border-border px-3 py-1.5 text-xs font-bold focus-dashed hover:bg-secondary transition-colors shrink-0"
+              >
+                Clear history
+              </button>
+            )}
           </div>
         )}
 
@@ -164,6 +256,13 @@ export default function OrdersPage() {
                           </div>
                         </div>
                       </div>
+                      <button
+                        onClick={() => handleClearOne(order.id)}
+                        aria-label="Clear order"
+                        className="w-8 h-8 rounded-full grid place-items-center focus-dashed transition-smooth hover:bg-secondary text-muted-foreground shrink-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
 
                     {/* Reference number */}
@@ -207,7 +306,9 @@ export default function OrdersPage() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h2 className="font-bold tracking-tight">Total spend</h2>
-                  <p className="text-xs text-muted-foreground mt-1">All orders</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {timeFilters.find((f) => f.id === timeFilter)?.label}
+                  </p>
                 </div>
                 <div className="text-right">
                   <div className="text-2xl font-black tracking-tight">Rs {totalSpend}</div>
@@ -218,13 +319,22 @@ export default function OrdersPage() {
               </div>
             </section>
           </div>
+        ) : hasAnyOrders ? (
+          <div className="text-center py-16">
+            <div className="relative w-16 h-16 mx-auto mb-6">
+              <img src="/icons/bill-line-black.svg" alt="" className="w-full h-full dark:hidden object-contain" loading="eager" decoding="sync" />
+              <img src="/icons/bill-line-white.svg" alt="" className="hidden w-full h-full dark:block object-contain" loading="eager" decoding="sync" />
+            </div>
+            <h2 className="text-xl font-bold tracking-tight">No orders {timeFilter === "all" ? "found" : `${timeFilters.find((f) => f.id === timeFilter)?.label.toLowerCase()}`}</h2>
+            <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
+              Try a different time range to see more of your order history.
+            </p>
+          </div>
         ) : (
           <div className="text-center">
-            <div className="w-24 h-24 bg-secondary/50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <div className="relative w-10 h-10">
-                <img src="/icons/bill-line-black.svg" alt="" className="w-full h-full dark:hidden object-contain" loading="eager" decoding="sync" />
-                <img src="/icons/bill-line-white.svg" alt="" className="hidden w-full h-full dark:block object-contain" loading="eager" decoding="sync" />
-              </div>
+            <div className="relative w-16 h-16 mx-auto mb-6">
+              <img src="/icons/bill-line-black.svg" alt="" className="w-full h-full dark:hidden object-contain" loading="eager" decoding="sync" />
+              <img src="/icons/bill-line-white.svg" alt="" className="hidden w-full h-full dark:block object-contain" loading="eager" decoding="sync" />
             </div>
             <h2 className="text-3xl font-bold tracking-tight">No orders found</h2>
             <p className="text-muted-foreground mt-2 max-w-sm mx-auto">

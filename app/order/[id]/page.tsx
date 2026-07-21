@@ -270,13 +270,13 @@ export default function OrderStatusPage() {
           <button
             id="reorder-btn"
             onClick={handleReorder}
-            className="inline-flex items-center gap-2 pill border border-border px-5 py-3 font-medium hover:bg-secondary transition-smooth focus-dashed text-sm"
+            className="inline-flex items-center gap-2 pill border border-border px-6 py-2.5 font-bold hover:bg-secondary transition-smooth focus-dashed text-sm"
           >
             <RotateCcw className="w-4 h-4" /> Reorder
           </button>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 pill bg-foreground text-background px-5 py-3 font-medium hover:bg-foreground/90 transition-smooth focus-dashed text-sm"
+            className="inline-flex items-center gap-2 pill bg-foreground text-background px-6 py-2.5 font-bold hover:bg-foreground/90 transition-smooth focus-dashed text-sm"
           >
             Order more <ArrowRight className="w-4 h-4" />
           </Link>

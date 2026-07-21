@@ -129,7 +129,7 @@ export default function VendorDashboard() {
         <div className="max-w-md rounded-3xl border border-border bg-card p-8 text-center">
           <h1 className="text-2xl font-bold tracking-tight">Vendor sign in required</h1>
           <p className="text-muted-foreground mt-3">Use the Google account approved for this shop.</p>
-          <Link href="/vendor/login" className="pill bg-foreground text-background px-5 py-3 inline-flex mt-6">
+          <Link href="/vendor/login" className="pill bg-foreground text-background px-6 py-2.5 text-sm font-bold inline-flex mt-6">
             Sign in
           </Link>
         </div>
@@ -145,7 +145,7 @@ export default function VendorDashboard() {
           <p className="text-muted-foreground mt-3">
             This shop is not approved for your Google account, or the shop does not exist.
           </p>
-          <Link href="/vendor" className="pill bg-foreground text-background px-5 py-3 inline-flex mt-6">
+          <Link href="/vendor" className="pill bg-foreground text-background px-6 py-2.5 text-sm font-bold inline-flex mt-6">
             View my shops
           </Link>
         </div>
@@ -375,15 +375,15 @@ export default function VendorDashboard() {
                     </div>
                     <ReceiptPreview order={selectedOrder} />
                     <div className="mt-8 flex gap-3">
-                       <Button variant="outline" className="flex-1 pill h-12" onClick={() => window.print()}>
+                       <Button variant="outline" className="flex-1 pill h-11 text-sm" onClick={() => window.print()}>
                          <Printer className="w-4 h-4 mr-2" /> Print Ticket
                        </Button>
                        {selectedOrder.status === "ready" ? (
-                         <Button className="flex-1 pill h-12 bg-success hover:bg-success/90" onClick={() => handleUpdateStatus(selectedOrder.id, "completed")}>
+                         <Button className="flex-1 pill h-11 text-sm bg-success hover:bg-success/90" onClick={() => handleUpdateStatus(selectedOrder.id, "completed")}>
                            <Check className="w-4 h-4 mr-2" /> Complete
                          </Button>
                        ) : (
-                         <Button className="flex-1 pill h-12 bg-foreground text-background" onClick={() => handleUpdateStatus(selectedOrder.id, "ready", "preparing")}>
+                         <Button className="flex-1 pill h-11 text-sm bg-foreground text-background" onClick={() => handleUpdateStatus(selectedOrder.id, "ready", "preparing")}>
                            <Bell className="w-4 h-4 mr-2" /> Make Ready
                          </Button>
                        )}
@@ -469,10 +469,10 @@ export default function VendorDashboard() {
                 </div>
                 <ReceiptPreview order={selectedOrder} />
                 <div className="mt-8 space-y-3">
-                   <Button className="w-full pill h-14 bg-foreground text-background" onClick={() => handleUpdateStatus(selectedOrder.id, selectedOrder.status === "ready" ? "completed" : "ready", selectedOrder.status)}>
+                   <Button className="w-full pill h-11 text-sm" onClick={() => handleUpdateStatus(selectedOrder.id, selectedOrder.status === "ready" ? "completed" : "ready", selectedOrder.status)}>
                       {selectedOrder.status === "ready" ? "Mark as Completed" : "Mark as Ready"}
                    </Button>
-                   <Button variant="outline" className="w-full pill h-14" onClick={() => setSelectedOrder(null)}>
+                   <Button variant="outline" className="w-full pill h-11 text-sm" onClick={() => setSelectedOrder(null)}>
                       Close
                    </Button>
                 </div>

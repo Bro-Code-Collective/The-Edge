@@ -168,7 +168,7 @@ export default function ProfilePage() {
 
                 <Link
                   href="/favorites"
-                  className="w-full flex items-center justify-center gap-2 py-3.5 bg-foreground text-background dark:bg-white dark:text-black rounded-2xl font-bold hover:opacity-90 transition-opacity"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 text-sm bg-foreground text-background dark:bg-white dark:text-black rounded-2xl font-bold hover:opacity-90 transition-opacity"
                 >
                   <Heart className="w-4 h-4 fill-current" />
                   View Favorites
@@ -228,7 +228,7 @@ export default function ProfilePage() {
             <button 
               onClick={signOut}
               disabled={isSigningOut}
-              className="w-full flex items-center justify-center gap-2 py-5 text-destructive font-bold hover:bg-destructive/5 rounded-[2.5rem] transition-smooth border border-transparent hover:border-destructive/10"
+              className="w-full flex items-center justify-center gap-2 py-3 text-sm text-destructive font-bold hover:bg-destructive/5 rounded-[2.5rem] transition-smooth border border-transparent hover:border-destructive/10"
             >
               <LogOut className="w-5 h-5" />
               {isSigningOut ? "Signing Out..." : "Sign Out"}

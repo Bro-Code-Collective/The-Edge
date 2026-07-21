@@ -23,11 +23,9 @@ export default function CartPage() {
     return (
       <div className="flex-1 bg-background flex flex-col">
         <div className="flex-1 container mx-auto px-4 py-20 md:pt-36 text-center">
-          <div className="w-24 h-24 bg-secondary/50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <div className="relative w-10 h-10">
-              <img src="/icons/cart-new-black.svg" alt="" className="w-full h-full dark:hidden object-contain" loading="eager" decoding="sync" />
-              <img src="/icons/cart-new-white.svg" alt="" className="hidden w-full h-full dark:block object-contain" loading="eager" decoding="sync" />
-            </div>
+          <div className="relative w-16 h-16 mx-auto mb-6">
+            <img src="/icons/cart-new-black.svg" alt="" className="w-full h-full dark:hidden object-contain" loading="eager" decoding="sync" />
+            <img src="/icons/cart-new-white.svg" alt="" className="hidden w-full h-full dark:block object-contain" loading="eager" decoding="sync" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight">Add items to start a cart</h1>
           <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
@@ -50,7 +48,7 @@ export default function CartPage() {
         {/* Left: cart items */}
         <div className="min-w-0">
           <div className="label-mono mb-2 text-primary">
-            ● {groupedEntries.length > 1 ? "Multi-shop cart" : "Shop cart"}
+            {groupedEntries.length > 1 ? "Multi-shop cart" : "Shop cart"}
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">Review Order</h1>
           <p className="text-muted-foreground mt-1 text-sm max-w-lg">
@@ -81,8 +79,9 @@ export default function CartPage() {
                       </div>
                       <div>
                         <div className="font-bold tracking-tight">{shop.name}</div>
-                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
-                          {list.length} {list.length === 1 ? 'item' : 'items'} • Prep: {shop.prepTime}
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold flex items-center gap-2">
+                          <span>{list.length} {list.length === 1 ? 'item' : 'items'}</span>
+                          <span>Prep: {shop.prepTime}</span>
                         </div>
                       </div>
                     </div>
@@ -170,7 +169,7 @@ export default function CartPage() {
                             <div className="inline-flex items-center rounded-full bg-background border border-border overflow-hidden">
                               <button
                                 onClick={() => setQty(c.item.id, c.qty - 1)}
-                                className="w-10 h-10 grid place-items-center hover:bg-secondary transition-colors"
+                                className="w-8 h-8 grid place-items-center hover:bg-secondary transition-colors"
                               >
                                 <Minus className="w-3.5 h-3.5" />
                               </button>
@@ -179,7 +178,7 @@ export default function CartPage() {
                               </span>
                               <button
                                 onClick={() => setQty(c.item.id, c.qty + 1)}
-                                className="w-10 h-10 grid place-items-center hover:bg-secondary transition-colors"
+                                className="w-8 h-8 grid place-items-center hover:bg-secondary transition-colors"
                               >
                                 <Plus className="w-3.5 h-3.5" />
                               </button>
@@ -198,7 +197,7 @@ export default function CartPage() {
         {/* Right: order summary */}
         <aside className="h-fit">
           <div className="sticky top-24 rounded-[2.5rem] border border-border bg-card p-8">
-            <div className="label-mono mb-4 text-primary">● Final Summary</div>
+            <div className="label-mono mb-4 text-primary">Final Summary</div>
             <h2 className="text-2xl font-bold tracking-tight mb-6">
               Total Order
             </h2>
@@ -236,7 +235,7 @@ export default function CartPage() {
 
             <button
               onClick={() => router.push("/checkout")}
-              className="w-full inline-flex items-center justify-center gap-3 h-16 rounded-2xl bg-foreground text-background font-bold hover:bg-foreground/90 transition-colors"
+              className="w-full inline-flex items-center justify-center gap-3 h-12 text-sm rounded-2xl bg-foreground text-background font-bold hover:bg-foreground/90 transition-colors"
             >
               Check out now <ArrowRight className="w-5 h-5" />
             </button>

@@ -91,10 +91,10 @@ export const FoodCard = ({ item, compact = false, shopName }: FoodCardProps) => 
                 onClick={handleFavorite}
                 disabled={toggleFavorite.isPending}
                 aria-label={fav ? "Remove from favorites" : "Add to favorites"}
-                className="w-7 h-7 rounded-full grid place-items-center focus-dashed transition-smooth hover:bg-secondary disabled:opacity-60 shrink-0"
+                className="w-9 h-9 rounded-full grid place-items-center focus-dashed transition-smooth hover:bg-secondary disabled:opacity-60 shrink-0"
               >
                 <Heart
-                  className={`w-[17px] h-[17px] ${
+                  className={`w-5 h-5 ${
                     fav ? "fill-red-500 text-red-500" : "text-muted-foreground"
                   }`}
                 />
@@ -145,7 +145,7 @@ export const FoodCard = ({ item, compact = false, shopName }: FoodCardProps) => 
                   if (isInCart) {
                     remove(item.id);
                     setSelectedQty(1);
-                    toast.success(`${item.title} removed from cart`);
+                    toast.error(`${item.title} removed from cart`);
                     return;
                   }
                   add(item, selectedQty);

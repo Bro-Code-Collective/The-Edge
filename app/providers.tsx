@@ -22,11 +22,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
         },
       })
   );
-  const [position, setPosition] = useState<"bottom-right" | "top-center">("bottom-right");
+  const [position, setPosition] = useState<"top-center" | "top-right">("top-right");
 
   useEffect(() => {
     const handleResize = () => {
-      setPosition(window.innerWidth < 768 ? "top-center" : "bottom-right");
+      setPosition(window.innerWidth < 768 ? "top-center" : "top-right");
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -46,13 +46,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <Toaster
           richColors
           position={position}
-          toastOptions={{
-            style: {
-              background: "hsl(var(--card))",
-              color: "hsl(var(--card-foreground))",
-              border: "1px solid hsl(var(--border))",
-            },
-          }}
+          offset={{ top: 88, right: 24 }}
+          mobileOffset={{ top: 24 }}
         />
       </ThemeProvider>
     </QueryClientProvider>
