@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Check, Heart, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { MenuItem } from "@/lib/mockData";
+import { MenuItem } from "@/lib/types";
 import { useCart } from "@/store/cart";
 import { useServerFavorites, useShopById, useSupabaseUser, useToggleFavorite } from "@/lib/supabase/hooks";
 
