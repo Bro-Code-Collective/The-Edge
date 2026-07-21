@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useSupabaseUser, useUserOrders } from "@/lib/supabase/hooks";
-import type { OrderStatus } from "@/lib/mockData";
+import type { OrderStatus } from "@/lib/types";
 
 const notifyingStatuses = new Set<OrderStatus>(["paid", "preparing", "ready", "customer_late"]);
 

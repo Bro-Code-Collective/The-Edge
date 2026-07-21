@@ -2,7 +2,7 @@ import {
   type MenuItem,
   type OrderStatus,
   type Shop,
-} from "@/lib/mockData";
+} from "@/lib/types";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type ShopRow = {
@@ -27,6 +27,8 @@ type ShopRow = {
   is_approved?: boolean;
   status?: string;
   available_time_slots: Record<string, string[]> | null;
+  opening_time?: string | null;
+  closing_time?: string | null;
 };
 
 type MenuItemRow = {
@@ -135,7 +137,28 @@ export function isSupabaseConfigured() {
   return true;
 }
 
+function checkIsCurrentlyOpen(isOpen: boolean, openingTime?: string | null, closingTime?: string | null): boolean {
+  if (!isOpen) return false;
+  if (!openingTime || !closingTime) return isOpen;
+  
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  
+  const [openH, openM] = openingTime.split(":").map(Number);
+  const [closeH, closeM] = closingTime.split(":").map(Number);
+  
+  const startMinutes = openH * 60 + (openM || 0);
+  const endMinutes = closeH * 60 + (closeM || 0);
+  
+  if (endMinutes >= startMinutes) {
+    return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
+  } else {
+    return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
+  }
+}
+
 function mapShop(row: ShopRow): Shop {
+  const isCurrentlyOpen = checkIsCurrentlyOpen(row.is_open, row.opening_time, row.closing_time);
   return {
     id: row.id,
     slug: row.slug,
@@ -145,8 +168,8 @@ function mapShop(row: ShopRow): Shop {
     emoji: row.emoji ?? "🍽️",
     banner: row.banner_url ?? undefined,
     logo: row.logo_url ?? undefined,
-    isOpen: row.is_open,
-    closedNote: row.closed_note ?? undefined,
+    isOpen: isCurrentlyOpen,
+    closedNote: !isCurrentlyOpen && row.is_open ? "Closed outside operating hours" : (row.closed_note ?? undefined),
     prepTime: `${row.prep_time_minutes} min`,
     rating: Number(row.rating),
     reviewCount: row.review_count,
@@ -155,6 +178,8 @@ function mapShop(row: ShopRow): Shop {
     paymentLink: row.payment_link ?? undefined,
     ownerId: row.owner_id ?? undefined,
     letterCode: row.letter_code ?? row.name.charAt(0).toUpperCase(),
+    openingTime: row.opening_time ?? "08:00",
+    closingTime: row.closing_time ?? "22:00",
   };
 }
 
@@ -558,6 +583,95 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     .from("orders")
     .update({ status })
     .eq("id", orderId);
+
+  if (error) throw error;
+}
+
+export async function deleteVendorOrder(orderId: string) {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) return;
+
+  const { error } = await supabase
+    .from("orders")
+    .delete()
+    .eq("id", orderId);
+
+  if (error) throw error;
+}
+
+export async function updateShopHours(shopId: string, openingTime: string, closingTime: string) {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) return;
+
+  const { error } = await supabase
+    .from("shops")
+    .update({
+      opening_time: openingTime,
+      closing_time: closingTime,
+    })
+    .eq("id", shopId);
+
+  if (error) throw error;
+}
+
+export async function createMenuItem(item: {
+  shopId: string;
+  title: string;
+  description?: string;
+  imageUrl?: string;
+  priceLkr: number;
+  category: string;
+  dietaryTags?: string[];
+  isAvailable?: boolean;
+}) {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) return;
+
+  const { error } = await supabase.from("menu_items").insert({
+    shop_id: item.shopId,
+    title: item.title,
+    description: item.description ?? "",
+    image_url: item.imageUrl ?? null,
+    price_lkr: item.priceLkr,
+    category: item.category,
+    dietary_tags: item.dietaryTags ?? [],
+    is_available: item.isAvailable ?? true,
+  });
+
+  if (error) throw error;
+}
+
+export async function updateMenuItem(
+  menuItemId: string,
+  updates: Partial<{
+    title: string;
+    description: string;
+    image_url: string | null;
+    price_lkr: number;
+    category: string;
+    dietary_tags: string[];
+    is_available: boolean;
+  }>
+) {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) return;
+
+  const { error } = await supabase
+    .from("menu_items")
+    .update(updates)
+    .eq("id", menuItemId);
+
+  if (error) throw error;
+}
+
+export async function deleteMenuItem(menuItemId: string) {
+  const supabase = getSupabaseBrowserClient();
+  if (!supabase) return;
+
+  const { error } = await supabase
+    .from("menu_items")
+    .delete()
+    .eq("id", menuItemId);
 
   if (error) throw error;
 }

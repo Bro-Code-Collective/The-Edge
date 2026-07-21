@@ -41,6 +41,8 @@ create table public.shops (
   is_approved boolean not null default false,
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
   available_time_slots jsonb not null default '{"default": ["ASAP"]}'::jsonb,
+  opening_time time not null default '08:00:00',
+  closing_time time not null default '22:00:00',
   created_at timestamptz not null default now()
 );
 
@@ -252,6 +254,13 @@ begin
   if p_user_id is null then
     raise exception 'Order requires an authenticated user';
   end if;
+
+  -- Auto-create profile if missing
+  insert into public.profiles (id, email, display_name)
+  select u.id, coalesce(u.email, ''), coalesce(u.raw_user_meta_data->>'full_name', u.raw_user_meta_data->>'name', p_customer_name, '')
+  from auth.users u
+  where u.id = p_user_id
+  on conflict (id) do nothing;
 
   if not exists (
     select 1
@@ -629,6 +638,18 @@ create policy "Vendors can update approved shop order status" on public.orders
     )
   );
 
+create policy "Vendors can delete approved shop orders" on public.orders
+  for delete to authenticated
+  using (
+    exists (
+      select 1 from public.shops
+      where id = orders.shop_id
+        and owner_id = auth.uid()
+        and is_approved = true
+        and status = 'approved'
+    )
+  );
+
 -- Order Items
 create policy "Users can read own order items" on public.order_items
   for select to authenticated
@@ -707,7 +728,9 @@ grant update (
   tags,
   categories,
   payment_link,
-  available_time_slots
+  available_time_slots,
+  opening_time,
+  closing_time
 ) on public.shops to authenticated;
 
 revoke update on public.orders from authenticated;

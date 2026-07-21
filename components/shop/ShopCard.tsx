@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Shop } from "@/lib/mockData";
+import { Shop } from "@/lib/types";
 import { motion } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 
