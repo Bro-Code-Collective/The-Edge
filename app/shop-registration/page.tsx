@@ -141,7 +141,7 @@ export default function ShopRegistrationPage() {
           <p className="text-muted-foreground leading-relaxed">
             The Edge team is not accepting new shop requests right now. Existing approved vendors can still sell normally.
           </p>
-          <Link href="/profile" className="pill bg-foreground text-background px-5 py-3 inline-flex mt-8">
+          <Link href="/profile" className="pill bg-foreground text-background px-6 py-2.5 text-sm font-bold inline-flex mt-8">
             Back to profile
           </Link>
         </div>
@@ -332,7 +332,7 @@ export default function ShopRegistrationPage() {
             id="submit-registration"
             type="submit"
             disabled={isSubmitting}
-            className="w-full pill bg-foreground text-background py-4 font-semibold hover:bg-foreground/90 transition-colors focus-dashed flex items-center justify-center gap-2"
+            className="w-full pill bg-foreground text-background py-2.5 text-sm font-bold hover:bg-foreground/90 transition-colors focus-dashed flex items-center justify-center gap-2"
           >
             {isSubmitting ? (
               <>

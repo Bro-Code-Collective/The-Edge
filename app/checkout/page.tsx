@@ -19,7 +19,6 @@ export default function CheckoutPage() {
   
   const [currentShopId, setCurrentShopId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [note, setNote] = useState("");
   const router = useRouter();
 
   const groupedMap = groupedByShop();
@@ -42,7 +41,6 @@ export default function CheckoutPage() {
         shopId: shopId,
         total: shopItems.reduce((n, c) => n + c.qty * c.item.price, 0),
         customerName: profileName || (user?.email?.split('@')[0]) || "Guest",
-        note: note,
         items: shopItems.map(c => ({
           menu_item_id: c.item.id,
           title: c.item.title,
@@ -82,7 +80,7 @@ export default function CheckoutPage() {
           </div>
           <h1 className="text-2xl font-bold">Your cart is empty</h1>
           <p className="text-muted-foreground">Looks like you&apos;ve already checked out or cleared your cart.</p>
-          <Button onClick={() => router.push("/")} className="pill px-8">
+          <Button onClick={() => router.push("/")} className="pill px-6">
             Go back to shops
           </Button>
         </div>
@@ -93,7 +91,7 @@ export default function CheckoutPage() {
   return (
     <div className="flex-1 bg-background pb-24">
       <div className="container mx-auto px-4 py-8 md:pt-28 max-w-2xl">
-        <div className="label-mono mb-2 text-primary">● Sequential Checkout</div>
+        <div className="label-mono mb-2 text-primary">Sequential Checkout</div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-8">Process Payments</h1>
 
         <div className="space-y-6">
@@ -141,7 +139,7 @@ export default function CheckoutPage() {
 
                   <Button 
                     onClick={() => handleStartPayment(shopId)}
-                    className="w-full pill bg-foreground text-background hover:bg-foreground/90 h-12"
+                    className="w-full pill bg-foreground text-background hover:bg-foreground/90 h-11"
                   >
                     Pay for {shop.name} <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
@@ -150,15 +148,6 @@ export default function CheckoutPage() {
             );
           })}
 
-          <section className="rounded-3xl border border-border bg-card p-6">
-            <h2 className="font-semibold tracking-tight mb-3 text-sm uppercase tracking-wider text-muted-foreground">Order notes</h2>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Any specific instructions for the vendors?"
-              className="w-full text-sm px-4 py-3 rounded-2xl bg-secondary border-none resize-none focus:ring-1 focus:ring-primary outline-none transition-all h-24"
-            />
-          </section>
         </div>
       </div>
 
@@ -210,7 +199,7 @@ export default function CheckoutPage() {
                           href={shop?.paymentLink || "#"} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-2 w-full h-14 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-colors"
+                          className="flex items-center justify-center gap-2 w-full h-11 text-sm rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition-colors"
                         >
                           Open Payment Link <ExternalLink className="w-4 h-4" />
                         </a>
@@ -223,7 +212,7 @@ export default function CheckoutPage() {
                         <Button 
                           onClick={() => handleConfirmPayment(currentShopId)}
                           disabled={loading}
-                          className="w-full h-14 rounded-2xl bg-foreground text-background font-bold hover:bg-foreground/90 disabled:opacity-50"
+                          className="w-full h-11 rounded-2xl bg-foreground text-background font-bold hover:bg-foreground/90 disabled:opacity-50"
                         >
                           {loading ? (
                             <span className="flex items-center gap-2">

@@ -59,17 +59,17 @@ export default function VendorHomePage() {
             This Google account does not own an approved shop. Submit a request or wait for admin approval.
           </p>
           <div className="mt-7 flex flex-col gap-3">
-            <Link href="/shop-registration" className="pill bg-foreground text-background px-5 py-3">
+            <Link href="/shop-registration" className="pill bg-foreground text-background px-6 py-2.5 text-sm font-bold">
               Register a shop
             </Link>
             <button
               onClick={signOut}
               disabled={isSigningOut}
-              className="pill border border-destructive/20 px-5 py-3 text-destructive disabled:opacity-50"
+              className="pill border border-destructive/20 px-6 py-2.5 text-sm font-bold text-destructive disabled:opacity-50"
             >
               {isSigningOut ? "Signing out..." : "Sign out"}
             </button>
-            <Link href="/" className="pill border border-border px-5 py-3">
+            <Link href="/" className="pill border border-border px-6 py-2.5 text-sm font-bold">
               Back home
             </Link>
           </div>
