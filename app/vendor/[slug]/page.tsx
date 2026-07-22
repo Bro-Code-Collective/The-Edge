@@ -26,6 +26,7 @@ import {
   useUpdateMenuItemDietaryTags
 } from "@/lib/supabase/hooks";
 import { useSignOut } from "@/lib/supabase/useSignOut";
+import { DeleteAccountButton } from "@/components/auth/DeleteAccountButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
@@ -439,8 +440,28 @@ export default function VendorDashboard() {
             </div>
           )}
 
+          {tab === "settings" && (
+            <div className="max-w-md space-y-5">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight">Store settings</h2>
+                <p className="text-sm text-muted-foreground mt-1">More store settings are coming soon.</p>
+              </div>
+              <div className="rounded-3xl border border-destructive/20 bg-destructive/5 p-5">
+                <h3 className="font-bold text-sm mb-1">Danger zone</h3>
+                <p className="text-xs text-muted-foreground mb-4">
+                  Deleting your account removes your vendor login. Your shop listing stays live but becomes
+                  unowned until an admin reassigns it.
+                </p>
+                <DeleteAccountButton
+                  redirectTo="/vendor/login"
+                  warning="This permanently deletes your vendor account and login. Your shop, its menu, and past orders remain but will no longer be manageable by you. This cannot be undone."
+                />
+              </div>
+            </div>
+          )}
+
           {/* Other tabs remain placeholders for now or can be ported later */}
-          {tab !== "orders" && tab !== "menu" && (
+          {tab !== "orders" && tab !== "menu" && tab !== "settings" && (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground italic">
                <p>Section &ldquo;{tab}&rdquo; under reconstruction for multi-shop flow.</p>
             </div>

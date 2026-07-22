@@ -14,6 +14,7 @@ import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { useSupabaseUser, useProfile, useUserOrders } from "@/lib/supabase/hooks";
 import { updateProfile } from "@/lib/supabase/data";
 import { useSignOut } from "@/lib/supabase/useSignOut";
+import { DeleteAccountButton } from "@/components/auth/DeleteAccountButton";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Footer } from "@/components/layout/Footer";
@@ -233,6 +234,8 @@ export default function ProfilePage() {
               <LogOut className="w-5 h-5" />
               {isSigningOut ? "Signing Out..." : "Sign Out"}
             </button>
+
+            <DeleteAccountButton redirectTo="/auth" />
           </div>
         </div>
       </main>
