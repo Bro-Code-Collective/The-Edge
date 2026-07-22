@@ -47,6 +47,7 @@ export default function NotificationsPage() {
     setClearedIds(ids);
     if (user?.id) {
       localStorage.setItem(`edge-cleared-notifications-${user.id}`, JSON.stringify([...ids]));
+      window.dispatchEvent(new Event("edge-cleared-notifications-updated"));
     }
   };
 
