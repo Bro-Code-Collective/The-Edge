@@ -585,16 +585,13 @@ export default function VendorDashboard() {
                     </div>
                     <ReceiptPreview order={selectedOrder} />
                     <div className="mt-8 flex gap-3">
-                       <Button variant="outline" className="flex-1 pill h-11 text-sm" onClick={() => window.print()}>
-                         <Printer className="w-4 h-4 mr-2" /> Print Ticket
-                       </Button>
                        {selectedOrder.status === "ready" ? (
-                         <Button className="flex-1 pill h-11 text-sm bg-success hover:bg-success/90 text-white font-bold" onClick={() => handleUpdateStatus(selectedOrder.id, "completed")}>
-                           <Check className="w-4 h-4 mr-2" /> Complete
+                         <Button className="w-full pill h-11 text-sm bg-success hover:bg-success/90 text-white font-bold" onClick={() => handleUpdateStatus(selectedOrder.id, "completed")}>
+                           <Check className="w-4 h-4 mr-2" /> Complete Order
                          </Button>
                        ) : (
-                         <Button className="flex-1 pill h-11 text-sm bg-foreground text-background font-bold" onClick={() => handleUpdateStatus(selectedOrder.id, "ready")}>
-                           <Bell className="w-4 h-4 mr-2" /> Make Ready
+                         <Button className="w-full pill h-11 text-sm bg-foreground text-background font-bold" onClick={() => handleUpdateStatus(selectedOrder.id, "ready")}>
+                           <Bell className="w-4 h-4 mr-2" /> Mark as Ready
                          </Button>
                        )}
                     </div>
