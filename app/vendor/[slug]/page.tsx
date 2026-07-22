@@ -2,46 +2,56 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   ListOrdered, Utensils, BarChart3, Settings,
   Check, ChefHat, Bell, TrendingUp, DollarSign,
-  Plus, Pencil, Power, Users,
+  Plus, Pencil, Power, Users, Trash2,
   ArrowLeft, ToggleLeft, ToggleRight, Upload,
   Search, X, RotateCcw, Printer, ChevronRight,
-  Clock, MapPin, Hash, User
+  Clock, MapPin, Hash, User, SunMoon
 } from "lucide-react";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell,
-} from "recharts";
 import { toast } from "sonner";
 import { 
   useUpdateOrderStatus, 
+  useDeleteVendorOrder,
+  useUpdateShopHours,
+  useCreateMenuItem,
+  useUpdateMenuItem,
+  useDeleteMenuItem,
   useVendorOrders, 
   useVendorSearch,
   useShopMenuItems,
   useSupabaseUser,
   useVendorShop,
-  useUpdateMenuItemDietaryTags
+  useUpdateMenuItemDietaryTags,
+  useUpdateShopDetails
 } from "@/lib/supabase/hooks";
 import { useSignOut } from "@/lib/supabase/useSignOut";
 import { DeleteAccountButton } from "@/components/auth/DeleteAccountButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
-import type { OrderStatus } from "@/lib/mockData";
+import type { OrderStatus } from "@/lib/types";
 import type { VendorOrder } from "@/lib/supabase/data";
 
 type Tab = "orders" | "menu" | "analytics" | "settings";
 
 export default function VendorDashboard() {
   const params = useParams();
+  const router = useRouter();
   const slug = params?.slug as string;
   const { data: user, isLoading: userLoading } = useSupabaseUser();
   const { data: shop, isLoading: shopLoading } = useVendorShop(slug, user?.id);
   const { data: menuItems = [] } = useShopMenuItems(shop?.id);
   const updateDietaryTags = useUpdateMenuItemDietaryTags(shop?.id);
+  const createItemMutation = useCreateMenuItem(shop?.id);
+  const updateItemMutation = useUpdateMenuItem(shop?.id);
+  const deleteItemMutation = useDeleteMenuItem(shop?.id);
+  const updateHoursMutation = useUpdateShopHours(slug);
+  const updateShopDetailsMutation = useUpdateShopDetails(slug);
+  const deleteOrderMutation = useDeleteVendorOrder();
   const { signOut, isSigningOut } = useSignOut("/vendor/login");
   
   const [tab, setTab] = useState<Tab>("orders");
@@ -49,12 +59,61 @@ export default function VendorDashboard() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [dateFilter, setDateFilter] = useState<"today" | "week" | "month">("today");
   const [selectedOrder, setSelectedOrder] = useState<VendorOrder | null>(null);
-  const [undoOrder, setUndoOrder] = useState<{ id: string, prevStatus: OrderStatus } | null>(null);
+
+  // Menu Modal State
+  const [isItemModalOpen, setIsItemModalOpen] = useState(false);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [itemForm, setItemForm] = useState({
+    title: "",
+    description: "",
+    price: "",
+    discountPrice: "",
+    category: "Main",
+    imageUrl: "",
+    isAvailable: true,
+    maxPerOrder: "",
+    estimatedPrepTime: "10",
+    badge: "",
+    isPopular: false,
+  });
+
+  // Settings State
+  const [openingTime, setOpeningTime] = useState("08:00");
+  const [closingTime, setClosingTime] = useState("22:00");
+  const [shopForm, setShopForm] = useState({
+    name: "",
+    tagline: "",
+    description: "",
+    emoji: "🍽️",
+    bannerUrl: "",
+    logoUrl: "",
+    isOpen: true,
+    closedNote: "",
+    prepTimeMinutes: 10,
+    paymentLink: "",
+  });
+
+  useEffect(() => {
+    if (shop) {
+      setOpeningTime(shop.openingTime || "08:00");
+      setClosingTime(shop.closingTime || "22:00");
+      setShopForm({
+        name: shop.name || "",
+        tagline: shop.tagline || "",
+        description: shop.description || "",
+        emoji: shop.emoji || "🍽️",
+        bannerUrl: shop.banner || "",
+        logoUrl: shop.logo || "",
+        isOpen: shop.isOpen ?? true,
+        closedNote: shop.closedNote || "",
+        prepTimeMinutes: shop.prepTime ? parseInt(shop.prepTime, 10) || 10 : 10,
+        paymentLink: shop.paymentLink || "",
+      });
+    }
+  }, [shop]);
 
   // Live orders query
   const { data: liveOrders = [], isLoading: ordersLoading } = useVendorOrders(shop?.id, dateFilter);
-  
-  // Search query (only active if debouncedQuery has value)
   const { data: searchResults = [] } = useVendorSearch(shop?.id, debouncedQuery, dateFilter);
 
   const updateOrderStatusMutation = useUpdateOrderStatus();
@@ -67,36 +126,186 @@ export default function VendorDashboard() {
 
   const ordersToDisplay = debouncedQuery ? searchResults : liveOrders;
 
-  const handleUpdateStatus = async (orderId: string, status: OrderStatus, prevStatus?: OrderStatus) => {
+  const handleUpdateStatus = async (orderId: string, status: OrderStatus) => {
     try {
       await updateOrderStatusMutation.mutateAsync({ orderId, status });
-      
-      if (status === "ready" && prevStatus) {
-        setUndoOrder({ id: orderId, prevStatus });
-        toast.success("Order marked as ready", {
-          action: {
-            label: "Undo",
-            onClick: () => handleUndo(orderId, prevStatus)
-          },
-          duration: 5000
-        });
-        // Clear undo after 5s
-        setTimeout(() => setUndoOrder(null), 5000);
-      } else {
-        toast.success(`Order marked as ${status}`);
-      }
-    } catch (e) {
+      toast.success(`Order marked as ${status}`);
+    } catch {
       toast.error("Failed to update status");
     }
   };
 
-  const handleUndo = async (orderId: string, prevStatus: OrderStatus) => {
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!confirm("Are you sure you want to delete this order?")) return;
     try {
-      await updateOrderStatusMutation.mutateAsync({ orderId, status: prevStatus });
-      setUndoOrder(null);
-      toast.success("Action undone");
-    } catch (e) {
-      toast.error("Failed to undo");
+      await deleteOrderMutation.mutateAsync(orderId);
+      if (selectedOrder?.id === orderId) setSelectedOrder(null);
+      toast.success("Order deleted");
+    } catch {
+      toast.error("Failed to delete order");
+    }
+  };
+
+  const handleAutoSaveShopDetails = async (
+    updates: Parameters<typeof updateShopDetailsMutation.mutateAsync>[0]["updates"],
+    label?: string
+  ) => {
+    if (!shop?.id) return;
+    try {
+      await updateShopDetailsMutation.mutateAsync({
+        shopId: shop.id,
+        updates,
+      });
+      toast.success(label ? `${label} updated!` : "Setting updated!");
+    } catch {
+      toast.error("Failed to save setting");
+    }
+  };
+
+  const handleSaveClosedNote = async () => {
+    if (!shop?.id) return;
+    try {
+      await updateShopDetailsMutation.mutateAsync({
+        shopId: shop.id,
+        updates: {
+          closed_note: shopForm.closedNote || null,
+        },
+      });
+      toast.success("Notice updated for customers!");
+    } catch {
+      toast.error("Failed to update closed notice");
+    }
+  };
+
+  const handleToggleStoreStatus = async () => {
+    if (!shop?.id) return;
+    const nextIsOpen = !shopForm.isOpen;
+    try {
+      await updateShopDetailsMutation.mutateAsync({
+        shopId: shop.id,
+        updates: {
+          is_open: nextIsOpen,
+        },
+      });
+      setShopForm((prev) => ({ ...prev, isOpen: nextIsOpen }));
+      toast.success(nextIsOpen ? "Store is now LIVE and accepting orders!" : "Store is now PAUSED.");
+    } catch {
+      toast.error("Failed to update store status");
+    }
+  };
+
+  const handleQuickToggleItemAvailability = async (itemId: string, currentStatus: boolean) => {
+    try {
+      await updateItemMutation.mutateAsync({
+        menuItemId: itemId,
+        updates: {
+          is_available: !currentStatus,
+        },
+      });
+      toast.success(!currentStatus ? "Item marked as In Stock" : "Item marked as Out of Stock");
+    } catch {
+      toast.error("Failed to update item availability");
+    }
+  };
+
+  const handleOpenItemModal = (item?: any) => {
+    if (item) {
+      setEditingItemId(item.id);
+      setItemForm({
+        title: item.title || "",
+        description: item.description || "",
+        price: item.price ? item.price.toString() : "",
+        discountPrice: item.discount ? item.discount.toString() : "",
+        category: item.category || "Main",
+        imageUrl: item.image || "",
+        isAvailable: item.isAvailable ?? true,
+        maxPerOrder: item.maxPerOrder ? item.maxPerOrder.toString() : "",
+        estimatedPrepTime: item.estimatedPrepTime ? parseInt(item.estimatedPrepTime, 10).toString() : "10",
+        badge: item.badge || "",
+        isPopular: item.popular ?? false,
+      });
+    } else {
+      setEditingItemId(null);
+      setItemForm({
+        title: "",
+        description: "",
+        price: "",
+        discountPrice: "",
+        category: "Main",
+        imageUrl: "",
+        isAvailable: true,
+        maxPerOrder: "",
+        estimatedPrepTime: "10",
+        badge: "",
+        isPopular: false,
+      });
+    }
+    setIsItemModalOpen(true);
+  };
+
+  const handleSaveItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!shop?.id) return;
+
+    const priceNum = parseInt(itemForm.price, 10);
+    if (isNaN(priceNum) || priceNum <= 0) {
+      toast.error("Please enter a valid price");
+      return;
+    }
+
+    const discountNum = itemForm.discountPrice ? parseInt(itemForm.discountPrice, 10) : null;
+    const maxOrderNum = itemForm.maxPerOrder ? parseInt(itemForm.maxPerOrder, 10) : null;
+    const prepTimeNum = itemForm.estimatedPrepTime ? parseInt(itemForm.estimatedPrepTime, 10) : 10;
+
+    try {
+      if (editingItemId) {
+        await updateItemMutation.mutateAsync({
+          menuItemId: editingItemId,
+          updates: {
+            title: itemForm.title,
+            description: itemForm.description,
+            price_lkr: priceNum,
+            discount_lkr: discountNum,
+            category: itemForm.category,
+            image_url: itemForm.imageUrl || null,
+            is_available: itemForm.isAvailable,
+            max_per_order: maxOrderNum,
+            estimated_prep_time_minutes: prepTimeNum,
+            badge: itemForm.badge || null,
+            is_popular: itemForm.isPopular,
+          },
+        });
+        toast.success("Menu item updated");
+      } else {
+        await createItemMutation.mutateAsync({
+          shopId: shop.id,
+          title: itemForm.title,
+          description: itemForm.description,
+          priceLkr: priceNum,
+          discountLkr: discountNum,
+          category: itemForm.category,
+          imageUrl: itemForm.imageUrl,
+          isAvailable: itemForm.isAvailable,
+          maxPerOrder: maxOrderNum,
+          estimatedPrepTimeMinutes: prepTimeNum,
+          badge: itemForm.badge || null,
+          isPopular: itemForm.isPopular,
+        });
+        toast.success("Menu item created");
+      }
+      setIsItemModalOpen(false);
+    } catch {
+      toast.error("Failed to save menu item");
+    }
+  };
+
+  const handleDeleteItem = async (itemId: string) => {
+    if (!confirm("Are you sure you want to delete this menu item?")) return;
+    try {
+      await deleteItemMutation.mutateAsync(itemId);
+      toast.success("Item deleted");
+    } catch {
+      toast.error("Failed to delete item");
     }
   };
 
@@ -155,9 +364,9 @@ export default function VendorDashboard() {
   }
 
   return (
-    <div className="flex-1 bg-secondary/20 flex overflow-hidden">
+    <div className="h-screen w-full bg-secondary/20 flex overflow-hidden">
       {/* ── SIDEBAR (Desktop) ── */}
-      <aside className="hidden lg:flex w-64 flex-col border-r border-border bg-background h-screen z-30">
+      <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-border bg-background h-full z-30">
         <div className="p-6 border-b border-border bg-card/50">
           <Link href="/" className="flex items-center gap-2 mb-8">
             <div className="w-8 h-8 rounded-xl hero-gradient grid place-items-center text-white font-bold text-sm">E</div>
@@ -174,16 +383,22 @@ export default function VendorDashboard() {
             </div>
           </div>
         </div>
-        <nav className="flex-1 p-4 space-y-2 mt-4">
+        <nav className="flex-1 p-4 space-y-2 mt-4 overflow-y-auto">
           {[
             { id: "orders", label: "Live Orders", icon: ListOrdered },
             { id: "menu", label: "Menu Items", icon: Utensils },
-            { id: "analytics", label: "Insights", icon: BarChart3 },
+            { id: "analytics", label: "Analytics", icon: BarChart3 },
             { id: "settings", label: "Store Settings", icon: Settings },
           ].map((t) => (
             <button
               key={t.id}
-              onClick={() => setTab(t.id as Tab)}
+              onClick={() => {
+                if (t.id === "analytics") {
+                  router.push(`/vendor/${slug}/analytics`);
+                } else {
+                  setTab(t.id as Tab);
+                }
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold transition-all ${
                 tab === t.id
                   ? "bg-foreground text-background"
@@ -194,15 +409,25 @@ export default function VendorDashboard() {
             </button>
           ))}
         </nav>
-        <div className="p-6 border-t border-border">
-          <button onClick={signOut} disabled={isSigningOut} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50">
-            <Power className="w-3 h-3" /> {isSigningOut ? "Signing out..." : "Sign out"}
+        <div className="p-5 border-t border-border mt-auto space-y-4">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-xs font-bold text-muted-foreground flex items-center gap-2">
+              <SunMoon className="w-4 h-4 text-primary" /> Theme
+            </span>
+            <ThemeToggle />
+          </div>
+          <button
+            onClick={signOut}
+            disabled={isSigningOut}
+            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50 font-medium w-full px-1 pt-2 border-t border-border/60"
+          >
+            <Power className="w-3.5 h-3.5" /> {isSigningOut ? "Signing out..." : "Sign out"}
           </button>
         </div>
       </aside>
 
       {/* ── MAIN CONTENT ── */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative">
         
         {/* Mobile Header / Tab Bar */}
         <header className="lg:hidden bg-background border-b border-border p-4 sticky top-0 z-20">
@@ -220,7 +445,6 @@ export default function VendorDashboard() {
                 disabled={isSigningOut}
                 className="w-8 h-8 rounded-full bg-secondary grid place-items-center text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
                 aria-label="Sign out"
-                title="Sign out"
               >
                 <Power className="w-4 h-4" />
               </button>
@@ -230,7 +454,13 @@ export default function VendorDashboard() {
             {["orders", "menu", "analytics", "settings"].map((t) => (
               <button
                 key={t}
-                onClick={() => setTab(t as Tab)}
+                onClick={() => {
+                  if (t === "analytics") {
+                    router.push(`/vendor/${slug}/analytics`);
+                  } else {
+                    setTab(t as Tab);
+                  }
+                }}
                 className={`px-4 py-2 rounded-full text-[11px] font-bold whitespace-nowrap border capitalize transition-all ${
                   tab === t 
                     ? "bg-foreground text-background border-foreground" 
@@ -246,7 +476,7 @@ export default function VendorDashboard() {
         {/* Global Toolbar */}
         <div className="bg-background border-b border-border px-6 py-4 flex items-center justify-between z-10 sticky top-0 hidden lg:flex">
           <div className="flex items-center gap-6">
-            <h1 className="text-xl font-bold capitalize">{tab === "orders" ? "Orders Feed" : tab}</h1>
+            <h1 className="text-xl font-bold capitalize">{tab === "orders" ? "Orders Feed" : tab === "menu" ? "Menu Items" : "Settings"}</h1>
             {tab === "orders" && (
               <div className="relative w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -266,29 +496,26 @@ export default function VendorDashboard() {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 bg-secondary/50 rounded-full p-1 border border-border">
-              {["today", "week", "month"].map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setDateFilter(f as any)}
-                  className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
-                    dateFilter === f ? "bg-background text-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-            <div className="w-px h-6 bg-border mx-2" />
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Store Status</span>
-              <button 
-                onClick={() => toast.info("Use settings to change store status")}
-                className={`w-10 h-6 rounded-full relative transition-colors ${shop.isOpen ? "bg-success" : "bg-muted"}`}
-              >
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${shop.isOpen ? "left-5" : "left-1"}`} />
-              </button>
-            </div>
+            {tab === "orders" && (
+              <div className="flex items-center gap-1 bg-secondary/50 rounded-full p-1 border border-border">
+                {["today", "week", "month"].map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setDateFilter(f as any)}
+                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all ${
+                      dateFilter === f ? "bg-background text-foreground" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+            )}
+            {tab === "menu" && (
+              <Button onClick={() => handleOpenItemModal()} className="pill bg-primary text-primary-foreground text-xs font-bold px-4 py-2">
+                <Plus className="w-4 h-4 mr-1.5" /> Add Menu Item
+              </Button>
+            )}
           </div>
         </div>
 
@@ -301,12 +528,12 @@ export default function VendorDashboard() {
               <div className="flex-1 space-y-8">
                 <div className="grid md:grid-cols-2 gap-6 h-full content-start">
                   
-                  {/* COLUMN: PREPARING */}
+                  {/* COLUMN: NEW / ACTIVE ORDERS */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between px-2">
                       <div className="flex items-center gap-2">
                         <ChefHat className="w-4 h-4 text-primary" />
-                        <h2 className="font-bold text-sm uppercase tracking-widest">New / Preparing</h2>
+                        <h2 className="font-bold text-sm uppercase tracking-widest">Active Orders</h2>
                       </div>
                       <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
                         {ordersToDisplay.filter(o => o.status === "paid" || o.status === "preparing").length}
@@ -320,6 +547,7 @@ export default function VendorDashboard() {
                           order={o} 
                           onClick={() => setSelectedOrder(o)}
                           onStatusChange={handleUpdateStatus}
+                          onDeleteOrder={handleDeleteOrder}
                           isActive={selectedOrder?.id === o.id}
                         />
                       ))}
@@ -329,7 +557,7 @@ export default function VendorDashboard() {
                     </div>
                   </div>
 
-                  {/* COLUMN: READY */}
+                  {/* COLUMN: READY FOR PICKUP */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between px-2">
                       <div className="flex items-center gap-2">
@@ -348,6 +576,7 @@ export default function VendorDashboard() {
                           order={o} 
                           onClick={() => setSelectedOrder(o)}
                           onStatusChange={handleUpdateStatus}
+                          onDeleteOrder={handleDeleteOrder}
                           isActive={selectedOrder?.id === o.id}
                         />
                       ))}
@@ -370,22 +599,24 @@ export default function VendorDashboard() {
                   >
                     <div className="flex justify-between items-center mb-6">
                       <h3 className="font-bold uppercase tracking-widest text-xs text-muted-foreground">Receipt Preview</h3>
-                      <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-secondary rounded-full">
-                        <X className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => handleDeleteOrder(selectedOrder.id)} className="p-2 hover:bg-destructive/10 text-destructive rounded-full">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-secondary rounded-full">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                     <ReceiptPreview order={selectedOrder} />
                     <div className="mt-8 flex gap-3">
-                       <Button variant="outline" className="flex-1 pill h-11 text-sm" onClick={() => window.print()}>
-                         <Printer className="w-4 h-4 mr-2" /> Print Ticket
-                       </Button>
                        {selectedOrder.status === "ready" ? (
-                         <Button className="flex-1 pill h-11 text-sm bg-success hover:bg-success/90" onClick={() => handleUpdateStatus(selectedOrder.id, "completed")}>
-                           <Check className="w-4 h-4 mr-2" /> Complete
+                         <Button className="w-full pill h-11 text-sm bg-success hover:bg-success/90 text-white font-bold" onClick={() => handleUpdateStatus(selectedOrder.id, "completed")}>
+                           <Check className="w-4 h-4 mr-2" /> Complete Order
                          </Button>
                        ) : (
-                         <Button className="flex-1 pill h-11 text-sm bg-foreground text-background" onClick={() => handleUpdateStatus(selectedOrder.id, "ready", "preparing")}>
-                           <Bell className="w-4 h-4 mr-2" /> Make Ready
+                         <Button className="w-full pill h-11 text-sm bg-foreground text-background font-bold" onClick={() => handleUpdateStatus(selectedOrder.id, "ready")}>
+                           <Bell className="w-4 h-4 mr-2" /> Mark as Ready
                          </Button>
                        )}
                     </div>
@@ -395,40 +626,101 @@ export default function VendorDashboard() {
             </div>
           )}
 
+          {/* ── MENU TAB ── */}
           {tab === "menu" && (
             <div className="space-y-5">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight">Menu items</h2>
-                <p className="text-sm text-muted-foreground mt-1">Mark products as vegan or vegetarian.</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight">Menu items</h2>
+                  <p className="text-sm text-muted-foreground mt-1">Manage your shop items, prices, and dietary tags.</p>
+                </div>
+                <Button onClick={() => handleOpenItemModal()} className="pill bg-primary text-primary-foreground text-xs font-bold px-4 py-2">
+                  <Plus className="w-4 h-4 mr-1.5" /> Add Menu Item
+                </Button>
               </div>
 
               <div className="grid gap-4">
                 {menuItems.map((item) => (
                   <div key={item.id} className="rounded-3xl border border-border bg-card p-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div className="min-w-0">
-                      <div className="font-bold tracking-tight truncate">{item.title}</div>
-                      <div className="text-sm text-muted-foreground mt-1">{item.category} · Rs {item.price.toFixed(0)}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold tracking-tight text-lg">{item.title}</span>
+                        {item.popular && (
+                          <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-bold">⭐ Popular</span>
+                        )}
+                        {item.badge && (
+                          <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">⚡ {item.badge}</span>
+                        )}
+                        {!item.isAvailable && (
+                          <span className="px-2 py-0.5 rounded-full bg-destructive/10 text-destructive text-[10px] font-bold">Out of Stock</span>
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1 flex items-center gap-2 flex-wrap">
+                        <span>{item.category}</span>
+                        <span>·</span>
+                        <span className="font-semibold text-foreground">Rs {item.price.toFixed(0)}</span>
+                        {item.discount && (
+                          <span className="line-through text-xs text-muted-foreground">Rs {item.discount}</span>
+                        )}
+                        {item.maxPerOrder && (
+                          <span className="text-xs px-2 py-0.5 bg-secondary rounded-full font-medium text-foreground">
+                            Max {item.maxPerOrder}/order
+                          </span>
+                        )}
+                        {item.estimatedPrepTime && (
+                          <span className="text-xs px-2 py-0.5 bg-secondary rounded-full font-medium text-foreground">
+                            ⏱️ {item.estimatedPrepTime}
+                          </span>
+                        )}
+                      </div>
+                      {item.description && <div className="text-xs text-muted-foreground mt-1 line-clamp-1">{item.description}</div>}
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {(["Vegan", "Vegetarian"] as const).map((tag) => {
-                        const active = item.dietaryTags.includes(tag);
-                        return (
-                          <button
-                            key={tag}
-                            type="button"
-                            onClick={() => toggleDietaryTag(item.id, item.dietaryTags, tag)}
-                            disabled={updateDietaryTags.isPending}
-                            className={`rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-widest transition-smooth disabled:opacity-60 ${
-                              active
-                                ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300"
-                                : "border-border bg-secondary/50 text-muted-foreground hover:text-foreground"
-                            }`}
-                          >
-                            {active && <Check className="mr-1.5 inline h-3.5 w-3.5" />}
-                            {tag}
-                          </button>
-                        );
-                      })}
+
+                    <div className="flex items-center gap-3 flex-wrap">
+                      {/* Quick stock toggle */}
+                      <button
+                        type="button"
+                        onClick={() => handleQuickToggleItemAvailability(item.id, item.isAvailable)}
+                        disabled={updateItemMutation.isPending}
+                        className={`rounded-full border px-3 py-1.5 text-xs font-bold transition-all ${
+                          item.isAvailable
+                            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
+                            : "border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20"
+                        }`}
+                      >
+                        {item.isAvailable ? "In Stock" : "Out of Stock"}
+                      </button>
+
+                      <div className="flex flex-wrap gap-1.5">
+                        {(["Vegan", "Vegetarian"] as const).map((tag) => {
+                          const active = item.dietaryTags.includes(tag);
+                          return (
+                            <button
+                              key={tag}
+                              type="button"
+                              onClick={() => toggleDietaryTag(item.id, item.dietaryTags, tag)}
+                              disabled={updateDietaryTags.isPending}
+                              className={`rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition-all disabled:opacity-60 ${
+                                active
+                                  ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300"
+                                  : "border-border bg-secondary/50 text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              {active && <Check className="mr-1 inline h-3 w-3" />}
+                              {tag}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleOpenItemModal(item)} className="pill">
+                          <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => handleDeleteItem(item.id)} className="pill border-destructive/30 text-destructive hover:bg-destructive/10">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -441,11 +733,168 @@ export default function VendorDashboard() {
           )}
 
           {tab === "settings" && (
-            <div className="max-w-md space-y-5">
+            <div className="max-w-2xl space-y-6">
               <div>
                 <h2 className="text-2xl font-bold tracking-tight">Store settings</h2>
-                <p className="text-sm text-muted-foreground mt-1">More store settings are coming soon.</p>
+                <p className="text-sm text-muted-foreground mt-1">Most fields save automatically when you leave the field.</p>
               </div>
+
+              {/* Store Status */}
+              <div className="rounded-3xl border border-border bg-card p-5 flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-sm">Store status</h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {shopForm.isOpen ? "Live and accepting orders" : "Paused — customers can't order"}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleToggleStoreStatus}
+                  disabled={updateShopDetailsMutation.isPending}
+                  className={`w-12 h-7 rounded-full relative transition-colors disabled:opacity-50 ${shopForm.isOpen ? "bg-success" : "bg-muted"}`}
+                >
+                  <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all ${shopForm.isOpen ? "left-6" : "left-1"}`} />
+                </button>
+              </div>
+
+              {/* Closed Note */}
+              <div className="rounded-3xl border border-border bg-card p-5 space-y-3">
+                <h3 className="font-bold text-sm">Closed notice</h3>
+                <p className="text-xs text-muted-foreground">Shown to customers while your store is paused or outside hours.</p>
+                <div className="flex gap-2">
+                  <Input
+                    value={shopForm.closedNote}
+                    onChange={(e) => setShopForm({ ...shopForm, closedNote: e.target.value })}
+                    placeholder="e.g. Back tomorrow at 8 AM"
+                    className="rounded-2xl"
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleSaveClosedNote}
+                    disabled={updateShopDetailsMutation.isPending}
+                    className="pill shrink-0"
+                  >
+                    Save
+                  </Button>
+                </div>
+              </div>
+
+              {/* Operating Hours */}
+              <div className="rounded-3xl border border-border bg-card p-5 space-y-3">
+                <h3 className="font-bold text-sm">Operating hours</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Opens</label>
+                    <Input type="time" value={openingTime} onChange={(e) => setOpeningTime(e.target.value)} className="rounded-2xl" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Closes</label>
+                    <Input type="time" value={closingTime} onChange={(e) => setClosingTime(e.target.value)} className="rounded-2xl" />
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    if (!shop?.id) return;
+                    try {
+                      await updateHoursMutation.mutateAsync({ shopId: shop.id, openingTime, closingTime });
+                      toast.success("Operating hours updated");
+                    } catch {
+                      toast.error("Failed to update hours");
+                    }
+                  }}
+                  disabled={updateHoursMutation.isPending}
+                  className="pill w-full"
+                >
+                  Save Hours
+                </Button>
+              </div>
+
+              {/* Shop Identity */}
+              <div className="rounded-3xl border border-border bg-card p-5 space-y-4">
+                <h3 className="font-bold text-sm">Shop details</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Name</label>
+                    <Input
+                      value={shopForm.name}
+                      onChange={(e) => setShopForm({ ...shopForm, name: e.target.value })}
+                      onBlur={() => handleAutoSaveShopDetails({ name: shopForm.name }, "Name")}
+                      className="rounded-2xl"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Emoji</label>
+                    <Input
+                      value={shopForm.emoji}
+                      onChange={(e) => setShopForm({ ...shopForm, emoji: e.target.value })}
+                      onBlur={() => handleAutoSaveShopDetails({ emoji: shopForm.emoji }, "Emoji")}
+                      className="rounded-2xl"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Tagline</label>
+                  <Input
+                    value={shopForm.tagline}
+                    onChange={(e) => setShopForm({ ...shopForm, tagline: e.target.value })}
+                    onBlur={() => handleAutoSaveShopDetails({ tagline: shopForm.tagline }, "Tagline")}
+                    className="rounded-2xl"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Description</label>
+                  <Input
+                    value={shopForm.description}
+                    onChange={(e) => setShopForm({ ...shopForm, description: e.target.value })}
+                    onBlur={() => handleAutoSaveShopDetails({ description: shopForm.description }, "Description")}
+                    className="rounded-2xl"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Banner URL</label>
+                    <Input
+                      value={shopForm.bannerUrl}
+                      onChange={(e) => setShopForm({ ...shopForm, bannerUrl: e.target.value })}
+                      onBlur={() => handleAutoSaveShopDetails({ banner_url: shopForm.bannerUrl || null }, "Banner")}
+                      className="rounded-2xl"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Logo URL</label>
+                    <Input
+                      value={shopForm.logoUrl}
+                      onChange={(e) => setShopForm({ ...shopForm, logoUrl: e.target.value })}
+                      onBlur={() => handleAutoSaveShopDetails({ logo_url: shopForm.logoUrl || null }, "Logo")}
+                      className="rounded-2xl"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Prep Time (mins)</label>
+                    <Input
+                      type="number"
+                      value={shopForm.prepTimeMinutes}
+                      onChange={(e) => setShopForm({ ...shopForm, prepTimeMinutes: parseInt(e.target.value, 10) || 0 })}
+                      onBlur={() => handleAutoSaveShopDetails({ prep_time_minutes: shopForm.prepTimeMinutes }, "Prep time")}
+                      className="rounded-2xl"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Payment Link</label>
+                    <Input
+                      value={shopForm.paymentLink}
+                      onChange={(e) => setShopForm({ ...shopForm, paymentLink: e.target.value })}
+                      onBlur={() => handleAutoSaveShopDetails({ payment_link: shopForm.paymentLink || null }, "Payment link")}
+                      className="rounded-2xl"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Danger Zone */}
               <div className="rounded-3xl border border-destructive/20 bg-destructive/5 p-5">
                 <h3 className="font-bold text-sm mb-1">Danger zone</h3>
                 <p className="text-xs text-muted-foreground mb-4">
@@ -454,13 +903,13 @@ export default function VendorDashboard() {
                 </p>
                 <DeleteAccountButton
                   redirectTo="/vendor/login"
-                  warning="This permanently deletes your vendor account and login. Your shop, its menu, and past orders remain but will no longer be manageable by you. This cannot be undone."
+                  warning="This permanently deletes your vendor account and login. Your shop, its menu, and past orders remain but will no longer be manageable by you."
                 />
               </div>
             </div>
           )}
 
-          {/* Other tabs remain placeholders for now or can be ported later */}
+          {/* Any remaining unhandled tab falls back to a placeholder */}
           {tab !== "orders" && tab !== "menu" && tab !== "settings" && (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground italic">
                <p>Section &ldquo;{tab}&rdquo; under reconstruction for multi-shop flow.</p>
@@ -468,6 +917,177 @@ export default function VendorDashboard() {
           )}
         </div>
       </main>
+
+      {/* ── EDIT / CREATE MENU ITEM MODAL ── */}
+      <AnimatePresence>
+        {isItemModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-lg bg-background border border-border rounded-3xl p-6 space-y-5 max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex justify-between items-center border-b border-border pb-4">
+                <h3 className="font-bold text-lg">{editingItemId ? "Edit Menu Item" : "Add Menu Item"}</h3>
+                <button onClick={() => setIsItemModalOpen(false)} className="p-2 hover:bg-secondary rounded-full">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveItem} className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Item Title</label>
+                  <Input
+                    required
+                    value={itemForm.title}
+                    onChange={(e) => setItemForm({ ...itemForm, title: e.target.value })}
+                    placeholder="e.g. Chicken Burger"
+                    className="rounded-2xl"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Regular Price (LKR)</label>
+                    <Input
+                      required
+                      type="number"
+                      value={itemForm.price}
+                      onChange={(e) => setItemForm({ ...itemForm, price: e.target.value })}
+                      placeholder="550"
+                      className="rounded-2xl"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Discount Price (LKR)</label>
+                    <Input
+                      type="number"
+                      value={itemForm.discountPrice}
+                      onChange={(e) => setItemForm({ ...itemForm, discountPrice: e.target.value })}
+                      placeholder="e.g. 480"
+                      className="rounded-2xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Category</label>
+                    <Input
+                      required
+                      value={itemForm.category}
+                      onChange={(e) => setItemForm({ ...itemForm, category: e.target.value })}
+                      placeholder="e.g. Mains, Beverages"
+                      className="rounded-2xl"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Max Per Order Limit</label>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={50}
+                      value={itemForm.maxPerOrder}
+                      onChange={(e) => setItemForm({ ...itemForm, maxPerOrder: e.target.value })}
+                      placeholder="Unlimited"
+                      className="rounded-2xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Estimated Prep (Mins)</label>
+                    <Input
+                      type="number"
+                      value={itemForm.estimatedPrepTime}
+                      onChange={(e) => setItemForm({ ...itemForm, estimatedPrepTime: e.target.value })}
+                      placeholder="10"
+                      className="rounded-2xl"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Badge Label</label>
+                    <Input
+                      value={itemForm.badge}
+                      onChange={(e) => setItemForm({ ...itemForm, badge: e.target.value })}
+                      placeholder="e.g. Chef Special, Spicy"
+                      className="rounded-2xl"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Description</label>
+                  <Input
+                    value={itemForm.description}
+                    onChange={(e) => setItemForm({ ...itemForm, description: e.target.value })}
+                    placeholder="Brief details & ingredients..."
+                    className="rounded-2xl"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Image URL</label>
+                  <Input
+                    value={itemForm.imageUrl}
+                    onChange={(e) => setItemForm({ ...itemForm, imageUrl: e.target.value })}
+                    placeholder="https://..."
+                    className="rounded-2xl"
+                  />
+                  {itemForm.imageUrl && (
+                    <div className="relative h-24 w-full rounded-2xl overflow-hidden border border-border bg-secondary">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={itemForm.imageUrl} alt="Item Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-3 pt-2">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="isAvailable"
+                      checked={itemForm.isAvailable}
+                      onChange={(e) => setItemForm({ ...itemForm, isAvailable: e.target.checked })}
+                      className="w-4 h-4 rounded border-border"
+                    />
+                    <label htmlFor="isAvailable" className="text-sm font-semibold cursor-pointer">
+                      Available for customer orders (In Stock)
+                    </label>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="isPopular"
+                      checked={itemForm.isPopular}
+                      onChange={(e) => setItemForm({ ...itemForm, isPopular: e.target.checked })}
+                      className="w-4 h-4 rounded border-border"
+                    />
+                    <label htmlFor="isPopular" className="text-sm font-semibold cursor-pointer">
+                      Feature as Popular / Highlighted Item
+                    </label>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4 border-t border-border">
+                  <Button type="button" variant="outline" onClick={() => setIsItemModalOpen(false)} className="flex-1 pill">
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="flex-1 pill bg-foreground text-background font-bold">
+                    Save Item
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile Receipt Bottom Sheet */}
       <AnimatePresence>
@@ -484,13 +1104,18 @@ export default function VendorDashboard() {
                 </div>
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="font-bold">Order Details</h3>
-                  <button onClick={() => setSelectedOrder(null)} className="p-2 bg-secondary rounded-full">
-                    <X className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => handleDeleteOrder(selectedOrder.id)} className="p-2 bg-destructive/10 text-destructive rounded-full">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => setSelectedOrder(null)} className="p-2 bg-secondary rounded-full">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 <ReceiptPreview order={selectedOrder} />
                 <div className="mt-8 space-y-3">
-                   <Button className="w-full pill h-11 text-sm" onClick={() => handleUpdateStatus(selectedOrder.id, selectedOrder.status === "ready" ? "completed" : "ready", selectedOrder.status)}>
+                   <Button className="w-full pill h-11 text-sm font-bold" onClick={() => handleUpdateStatus(selectedOrder.id, selectedOrder.status === "ready" ? "completed" : "ready")}>
                       {selectedOrder.status === "ready" ? "Mark as Completed" : "Mark as Ready"}
                    </Button>
                    <Button variant="outline" className="w-full pill h-11 text-sm" onClick={() => setSelectedOrder(null)}>
@@ -511,11 +1136,13 @@ function OrderCard({
   order, 
   onClick, 
   onStatusChange,
+  onDeleteOrder,
   isActive 
 }: { 
   order: VendorOrder, 
   onClick: () => void,
-  onStatusChange: (id: string, status: OrderStatus, prev?: OrderStatus) => void,
+  onStatusChange: (id: string, status: OrderStatus) => void,
+  onDeleteOrder: (id: string) => void,
   isActive: boolean
 }) {
   return (
@@ -539,9 +1166,21 @@ function OrderCard({
             </span>
           )}
         </div>
-        <span className={`text-[10px] font-medium ${isActive ? "text-background/60" : "text-muted-foreground"}`}>
-          {order.time}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className={`text-[10px] font-medium ${isActive ? "text-background/60" : "text-muted-foreground"}`}>
+            {order.time}
+          </span>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeleteOrder(order.id);
+            }}
+            className={`p-1 rounded-md transition-colors ${isActive ? "hover:bg-white/20 text-white/80" : "hover:bg-destructive/10 text-muted-foreground hover:text-destructive"}`}
+            title="Delete Order"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
       <div className="space-y-1.5 mb-4">
@@ -572,7 +1211,7 @@ function OrderCard({
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           {order.status !== "ready" ? (
             <button
-              onClick={() => onStatusChange(order.id, "ready", "preparing")}
+              onClick={() => onStatusChange(order.id, "ready")}
               className={`pill text-[10px] font-bold px-4 py-2 transition-all ${
                 isActive 
                   ? "bg-primary text-primary-foreground hover:bg-primary-glow" 

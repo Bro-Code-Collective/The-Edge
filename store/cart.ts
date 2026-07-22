@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { MenuItem } from "@/lib/mockData";
+import { MenuItem } from "@/lib/types";
 
 export type CartEntry = {
   item: MenuItem;
@@ -48,11 +48,15 @@ export const useCart = create<CartState>()(
 
     add: (item, qty = 1, opts) => {
       const state = get();
-      const existing = state.items.find((c) => c.item.id === item.id);
+      // Enforce single-shop cart: if cart contains items from a different shop, clear them first
+      const hasDifferentShop = state.items.some((c) => c.item.shopId !== item.shopId);
+      const currentItems = hasDifferentShop ? [] : state.items;
+
+      const existing = currentItems.find((c) => c.item.id === item.id);
         
       let newItems: CartEntry[];
       if (existing) {
-        newItems = state.items.map((c) =>
+        newItems = currentItems.map((c) =>
           c.item.id === item.id
             ? {
                 ...c,
@@ -65,7 +69,7 @@ export const useCart = create<CartState>()(
         );
       } else {
         newItems = [
-          ...state.items,
+          ...currentItems,
           {
             item,
             qty,

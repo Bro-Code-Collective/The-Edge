@@ -4,27 +4,32 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { Trash2, X } from "lucide-react";
+import { Trash2, X, Check } from "lucide-react";
 import { toast } from "sonner";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function DeleteAccountButton({
   redirectTo = "/auth",
   warning = "This permanently deletes your account, saved favorites, and cart. This cannot be undone.",
+  acknowledgeLabel = "I understand all my data will be permanently deleted.",
 }: {
   redirectTo?: string;
   warning?: string;
+  acknowledgeLabel?: string;
 }) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [confirmText, setConfirmText] = useState("");
+  const [acknowledged, setAcknowledged] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const canConfirm = confirmText.trim().toUpperCase() === "DELETE";
+  const handleClose = () => {
+    setOpen(false);
+    setAcknowledged(false);
+  };
 
   const handleDelete = async () => {
-    if (!canConfirm || isDeleting) return;
+    if (!acknowledged || isDeleting) return;
     setIsDeleting(true);
 
     try {
@@ -69,10 +74,7 @@ export function DeleteAccountButton({
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold tracking-tight text-destructive">Delete account?</h3>
                 <button
-                  onClick={() => {
-                    setOpen(false);
-                    setConfirmText("");
-                  }}
+                  onClick={handleClose}
                   className="p-2 hover:bg-secondary rounded-full"
                   disabled={isDeleting}
                 >
@@ -82,20 +84,25 @@ export function DeleteAccountButton({
 
               <p className="text-sm text-muted-foreground leading-relaxed mb-5">{warning}</p>
 
-              <label className="block text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
-                Type DELETE to confirm
+              <label className="flex items-start gap-3 mb-6 cursor-pointer select-none">
+                <span className="relative shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={acknowledged}
+                    onChange={(e) => setAcknowledged(e.target.checked)}
+                    disabled={isDeleting}
+                    className="peer sr-only"
+                  />
+                  <span className="flex w-5 h-5 rounded-md border-2 border-border peer-checked:bg-destructive peer-checked:border-destructive items-center justify-center transition-colors">
+                    {acknowledged && <Check className="w-3.5 h-3.5 text-destructive-foreground" />}
+                  </span>
+                </span>
+                <span className="text-sm font-semibold leading-snug">{acknowledgeLabel}</span>
               </label>
-              <input
-                value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
-                placeholder="DELETE"
-                disabled={isDeleting}
-                className="w-full h-11 rounded-2xl border border-border bg-secondary/30 px-4 text-sm font-bold tracking-widest text-center outline-none focus-visible:ring-2 focus-visible:ring-destructive mb-6 disabled:opacity-50"
-              />
 
               <button
                 onClick={handleDelete}
-                disabled={!canConfirm || isDeleting}
+                disabled={!acknowledged || isDeleting}
                 className="w-full h-12 rounded-2xl bg-destructive text-destructive-foreground font-bold text-sm disabled:opacity-40 disabled:pointer-events-none active:scale-[0.98] transition-all"
               >
                 {isDeleting ? "Deleting..." : "Permanently Delete My Account"}

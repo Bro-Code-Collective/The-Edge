@@ -6,7 +6,7 @@ import { ExternalLink, ChevronRight, X, CheckCircle2, AlertCircle } from "lucide
 import { toast } from "sonner";
 import { useCart } from "@/store/cart";
 import { useProfile } from "@/store/profile";
-import { useCreateOrder, useShops, useSupabaseUser } from "@/lib/supabase/hooks";
+import { useCreateOrder, useShops, useSupabaseUser, useProfile as useProfileData } from "@/lib/supabase/hooks";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -14,6 +14,7 @@ export default function CheckoutPage() {
   const { items, clearShop, groupedByShop } = useCart();
   const { name: profileName } = useProfile();
   const { data: user } = useSupabaseUser();
+  const { data: dbProfile } = useProfileData(user?.id);
   const { data: shops } = useShops();
   const { mutateAsync: createOrder } = useCreateOrder();
   
@@ -23,6 +24,13 @@ export default function CheckoutPage() {
 
   const groupedMap = groupedByShop();
   const shopIds = Array.from(groupedMap.keys());
+
+  const customerDisplayName = 
+    dbProfile?.displayName || 
+    user?.user_metadata?.full_name || 
+    user?.user_metadata?.name || 
+    (profileName && profileName.trim() ? profileName : null) || 
+    (user?.email ? user.email.split('@')[0] : "Customer");
   
   const handleStartPayment = (shopId: string) => {
     setCurrentShopId(shopId);
@@ -40,7 +48,7 @@ export default function CheckoutPage() {
         userId: user?.id || null,
         shopId: shopId,
         total: shopItems.reduce((n, c) => n + c.qty * c.item.price, 0),
-        customerName: profileName || (user?.email?.split('@')[0]) || "Guest",
+        customerName: customerDisplayName,
         items: shopItems.map(c => ({
           menu_item_id: c.item.id,
           title: c.item.title,

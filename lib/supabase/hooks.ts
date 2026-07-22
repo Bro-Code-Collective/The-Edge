@@ -23,10 +23,16 @@ import {
   searchVendorOrders,
   updateOrderStatus as updateOrderStatusFn,
   updateMenuItemDietaryTags,
+  deleteVendorOrder,
+  updateShopHours,
+  updateShopDetails,
+  createMenuItem,
+  updateMenuItem,
+  deleteMenuItem,
   type CreateOrderParams,
 } from "@/lib/supabase/data";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import type { OrderStatus } from "@/lib/mockData";
+import type { OrderStatus } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // SHOP HOOKS
@@ -110,6 +116,82 @@ export function useUpdateMenuItemDietaryTags(shopId?: string) {
       queryClient.invalidateQueries({ queryKey: ["shop-menu-items", shopId] });
       queryClient.invalidateQueries({ queryKey: ["menu-items"] });
       queryClient.invalidateQueries({ queryKey: ["all-menu-items"] });
+    },
+  });
+}
+
+export function useCreateMenuItem(shopId?: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createMenuItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["shop-menu-items", shopId] });
+      queryClient.invalidateQueries({ queryKey: ["menu-items"] });
+      queryClient.invalidateQueries({ queryKey: ["all-menu-items"] });
+    },
+  });
+}
+
+export function useUpdateMenuItem(shopId?: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ menuItemId, updates }: { menuItemId: string; updates: Parameters<typeof updateMenuItem>[1] }) =>
+      updateMenuItem(menuItemId, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["shop-menu-items", shopId] });
+      queryClient.invalidateQueries({ queryKey: ["menu-items"] });
+      queryClient.invalidateQueries({ queryKey: ["all-menu-items"] });
+    },
+  });
+}
+
+export function useDeleteMenuItem(shopId?: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (menuItemId: string) => deleteMenuItem(menuItemId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["shop-menu-items", shopId] });
+      queryClient.invalidateQueries({ queryKey: ["menu-items"] });
+      queryClient.invalidateQueries({ queryKey: ["all-menu-items"] });
+    },
+  });
+}
+
+export function useUpdateShopHours(shopSlug?: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ shopId, openingTime, closingTime }: { shopId: string; openingTime: string; closingTime: string }) =>
+      updateShopHours(shopId, openingTime, closingTime),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["vendor-shop", shopSlug] });
+      queryClient.invalidateQueries({ queryKey: ["shops"] });
+      queryClient.invalidateQueries({ queryKey: ["shop", shopSlug] });
+      queryClient.invalidateQueries({ queryKey: ["shop-by-id", variables.shopId] });
+    },
+  });
+}
+
+export function useUpdateShopDetails(shopSlug?: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ shopId, updates }: { shopId: string; updates: Parameters<typeof updateShopDetails>[1] }) =>
+      updateShopDetails(shopId, updates),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["vendor-shop", shopSlug] });
+      queryClient.invalidateQueries({ queryKey: ["shops"] });
+      queryClient.invalidateQueries({ queryKey: ["shop", shopSlug] });
+      queryClient.invalidateQueries({ queryKey: ["shop-by-id", variables.shopId] });
+    },
+  });
+}
+
+export function useDeleteVendorOrder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (orderId: string) => deleteVendorOrder(orderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vendor-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["user-orders"] });
     },
   });
 }
