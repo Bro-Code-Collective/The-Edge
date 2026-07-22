@@ -7,6 +7,9 @@ import { motion } from "framer-motion";
 import { useCart } from "@/store/cart";
 import { HomeIcon, SearchIcon, CartIcon, ProfileIcon } from "@/components/ui/NavIcons";
 
+const BUBBLE =
+  "bg-white dark:bg-neutral-900 shadow-[0_8px_24px_rgba(0,0,0,0.15)] border border-black/5 dark:border-white/10";
+
 export const BottomNav = () => {
   const count = useCart((s) => s.count());
   const pathname = usePathname();
@@ -28,11 +31,11 @@ export const BottomNav = () => {
       className="md:hidden fixed bottom-0 inset-x-0 z-50 flex flex-col items-center gap-2 pointer-events-none"
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
     >
-      <div className="flex items-center gap-2 bg-white dark:bg-neutral-900 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.15)] border border-black/5 dark:border-white/10 p-2 pointer-events-auto">
+      <div className="flex items-center gap-3 pointer-events-auto">
         <Link
           href="/"
           aria-label="Home"
-          className="w-11 h-11 rounded-full grid place-items-center active:scale-90 transition-smooth shrink-0"
+          className={`w-12 h-12 rounded-full ${BUBBLE} grid place-items-center active:scale-90 transition-smooth shrink-0`}
         >
           <HomeIcon className={`w-5 h-5 ${colorClass(isHome)}`} />
         </Link>
@@ -41,8 +44,8 @@ export const BottomNav = () => {
           <Link
             href="/browse"
             aria-label="Search"
-            className={`h-11 rounded-full flex items-center justify-center gap-2 active:scale-95 transition-smooth overflow-hidden ${
-              mounted ? "px-5 bg-secondary/70" : "w-11"
+            className={`h-12 rounded-full ${BUBBLE} flex items-center justify-center gap-2 active:scale-95 transition-smooth overflow-hidden ${
+              mounted ? "px-5" : "w-12"
             }`}
           >
             <SearchIcon filled={isBrowse} className={`w-5 h-5 shrink-0 ${colorClass(isBrowse)}`} />
@@ -62,7 +65,7 @@ export const BottomNav = () => {
         <Link
           href="/cart"
           aria-label="Cart"
-          className="relative w-11 h-11 rounded-full grid place-items-center active:scale-90 transition-smooth shrink-0"
+          className={`relative w-12 h-12 rounded-full ${BUBBLE} grid place-items-center active:scale-90 transition-smooth shrink-0`}
         >
           <CartIcon filled={isCart} className={`w-5 h-5 ${colorClass(isCart)}`} />
           {mounted && count > 0 && (
@@ -75,7 +78,7 @@ export const BottomNav = () => {
         <Link
           href="/profile"
           aria-label="Profile"
-          className="w-11 h-11 rounded-full grid place-items-center active:scale-90 transition-smooth shrink-0"
+          className={`w-12 h-12 rounded-full ${BUBBLE} grid place-items-center active:scale-90 transition-smooth shrink-0`}
         >
           <ProfileIcon filled={isProfile} className={`w-5 h-5 ${colorClass(isProfile)}`} />
         </Link>
