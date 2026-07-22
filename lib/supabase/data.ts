@@ -169,7 +169,7 @@ function mapShop(row: ShopRow): Shop {
     banner: row.banner_url ?? undefined,
     logo: row.logo_url ?? undefined,
     isOpen: isCurrentlyOpen,
-    closedNote: !isCurrentlyOpen && row.is_open ? "Closed outside operating hours" : (row.closed_note ?? undefined),
+    closedNote: row.closed_note || (!isCurrentlyOpen ? "Closed outside operating hours" : undefined),
     prepTime: `${row.prep_time_minutes} min`,
     rating: Number(row.rating),
     reviewCount: row.review_count,

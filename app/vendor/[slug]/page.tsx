@@ -144,30 +144,34 @@ export default function VendorDashboard() {
     }
   };
 
-  const handleSaveShopDetails = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleAutoSaveShopDetails = async (
+    updates: Parameters<typeof updateShopDetailsMutation.mutateAsync>[0]["updates"],
+    label?: string
+  ) => {
+    if (!shop?.id) return;
+    try {
+      await updateShopDetailsMutation.mutateAsync({
+        shopId: shop.id,
+        updates,
+      });
+      toast.success(label ? `${label} updated!` : "Setting updated!");
+    } catch {
+      toast.error("Failed to save setting");
+    }
+  };
+
+  const handleSaveClosedNote = async () => {
     if (!shop?.id) return;
     try {
       await updateShopDetailsMutation.mutateAsync({
         shopId: shop.id,
         updates: {
-          name: shopForm.name,
-          tagline: shopForm.tagline,
-          description: shopForm.description,
-          emoji: shopForm.emoji,
-          banner_url: shopForm.bannerUrl || null,
-          logo_url: shopForm.logoUrl || null,
-          is_open: shopForm.isOpen,
           closed_note: shopForm.closedNote || null,
-          prep_time_minutes: shopForm.prepTimeMinutes,
-          payment_link: shopForm.paymentLink || null,
-          opening_time: openingTime,
-          closing_time: closingTime,
         },
       });
-      toast.success("Store details updated successfully!");
+      toast.success("Notice updated for customers!");
     } catch {
-      toast.error("Failed to update store details");
+      toast.error("Failed to update closed notice");
     }
   };
 
@@ -708,7 +712,7 @@ export default function VendorDashboard() {
 
           {/* ── SETTINGS TAB ── */}
           {tab === "settings" && (
-            <form onSubmit={handleSaveShopDetails} className="max-w-2xl space-y-6">
+            <div className="max-w-2xl space-y-6">
               <div>
                 <h2 className="text-2xl font-bold tracking-tight">Store Management & Controls</h2>
                 <p className="text-sm text-muted-foreground mt-1">Configure shop profile, branding, order limits, and operational hours.</p>
@@ -740,13 +744,26 @@ export default function VendorDashboard() {
 
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Closed Note / Notice to Customers</label>
-                  <Input
-                    value={shopForm.closedNote}
-                    onChange={(e) => setShopForm({ ...shopForm, closedNote: e.target.value })}
-                    placeholder="e.g. Back in 30 minutes! High order volume."
-                    className="rounded-2xl"
-                  />
-                  <p className="text-[11px] text-muted-foreground">Shown to customers when your shop is paused or closed.</p>
+                  <div className="flex gap-2">
+                    <Input
+                      value={shopForm.closedNote}
+                      onChange={(e) => setShopForm({ ...shopForm, closedNote: e.target.value })}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSaveClosedNote();
+                      }}
+                      placeholder="e.g. Back in 30 minutes! High order volume."
+                      className="rounded-2xl flex-1"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleSaveClosedNote}
+                      disabled={updateShopDetailsMutation.isPending}
+                      className="pill bg-foreground text-background font-bold text-xs px-5 shrink-0"
+                    >
+                      Save Note
+                    </Button>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">Shown to customers on your store page when paused or closed.</p>
                 </div>
               </div>
 
@@ -761,6 +778,7 @@ export default function VendorDashboard() {
                       required
                       value={shopForm.name}
                       onChange={(e) => setShopForm({ ...shopForm, name: e.target.value })}
+                      onBlur={() => handleAutoSaveShopDetails({ name: shopForm.name }, "Shop name")}
                       className="rounded-2xl"
                     />
                   </div>
@@ -769,6 +787,7 @@ export default function VendorDashboard() {
                     <Input
                       value={shopForm.emoji}
                       onChange={(e) => setShopForm({ ...shopForm, emoji: e.target.value })}
+                      onBlur={() => handleAutoSaveShopDetails({ emoji: shopForm.emoji }, "Emoji icon")}
                       placeholder="🍽️"
                       className="rounded-2xl text-center text-lg"
                     />
@@ -780,6 +799,7 @@ export default function VendorDashboard() {
                   <Input
                     value={shopForm.tagline}
                     onChange={(e) => setShopForm({ ...shopForm, tagline: e.target.value })}
+                    onBlur={() => handleAutoSaveShopDetails({ tagline: shopForm.tagline }, "Tagline")}
                     placeholder="e.g. Fresh artisan pizza & pasta"
                     className="rounded-2xl"
                   />
@@ -790,6 +810,7 @@ export default function VendorDashboard() {
                   <Input
                     value={shopForm.description}
                     onChange={(e) => setShopForm({ ...shopForm, description: e.target.value })}
+                    onBlur={() => handleAutoSaveShopDetails({ description: shopForm.description }, "Description")}
                     placeholder="Tell customers about your kitchen..."
                     className="rounded-2xl"
                   />
@@ -802,6 +823,7 @@ export default function VendorDashboard() {
                     <Input
                       value={shopForm.bannerUrl}
                       onChange={(e) => setShopForm({ ...shopForm, bannerUrl: e.target.value })}
+                      onBlur={() => handleAutoSaveShopDetails({ banner_url: shopForm.bannerUrl || null }, "Banner image")}
                       placeholder="https://..."
                       className="rounded-2xl"
                     />
@@ -818,6 +840,7 @@ export default function VendorDashboard() {
                     <Input
                       value={shopForm.logoUrl}
                       onChange={(e) => setShopForm({ ...shopForm, logoUrl: e.target.value })}
+                      onBlur={() => handleAutoSaveShopDetails({ logo_url: shopForm.logoUrl || null }, "Logo image")}
                       placeholder="https://..."
                       className="rounded-2xl"
                     />
@@ -835,6 +858,7 @@ export default function VendorDashboard() {
                   <Input
                     value={shopForm.paymentLink}
                     onChange={(e) => setShopForm({ ...shopForm, paymentLink: e.target.value })}
+                    onBlur={() => handleAutoSaveShopDetails({ payment_link: shopForm.paymentLink || null }, "Payment link")}
                     placeholder="https://pay.example.com/..."
                     className="rounded-2xl"
                   />
@@ -853,6 +877,7 @@ export default function VendorDashboard() {
                     max={120}
                     value={shopForm.prepTimeMinutes}
                     onChange={(e) => setShopForm({ ...shopForm, prepTimeMinutes: parseInt(e.target.value, 10) || 10 })}
+                    onBlur={() => handleAutoSaveShopDetails({ prep_time_minutes: shopForm.prepTimeMinutes }, "Average prep time")}
                     className="rounded-2xl max-w-xs"
                   />
                   <p className="text-[11px] text-muted-foreground">Used to calculate estimated pickup times for customers.</p>
@@ -864,7 +889,10 @@ export default function VendorDashboard() {
                     <Input
                       type="time"
                       value={openingTime}
-                      onChange={(e) => setOpeningTime(e.target.value)}
+                      onChange={(e) => {
+                        setOpeningTime(e.target.value);
+                        handleAutoSaveShopDetails({ opening_time: e.target.value }, "Opening time");
+                      }}
                       className="rounded-2xl"
                     />
                   </div>
@@ -873,7 +901,10 @@ export default function VendorDashboard() {
                     <Input
                       type="time"
                       value={closingTime}
-                      onChange={(e) => setClosingTime(e.target.value)}
+                      onChange={(e) => {
+                        setClosingTime(e.target.value);
+                        handleAutoSaveShopDetails({ closing_time: e.target.value }, "Closing time");
+                      }}
                       className="rounded-2xl"
                     />
                   </div>
@@ -890,15 +921,7 @@ export default function VendorDashboard() {
                   <ThemeToggle />
                 </div>
               </div>
-
-              <Button
-                type="submit"
-                disabled={updateShopDetailsMutation.isPending}
-                className="pill bg-foreground text-background font-bold h-12 w-full text-base"
-              >
-                {updateShopDetailsMutation.isPending ? "Saving changes..." : "Save Store Configuration"}
-              </Button>
-            </form>
+            </div>
           )}
 
         </div>
