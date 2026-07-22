@@ -37,7 +37,7 @@ export const BottomNav = () => {
           aria-label="Home"
           className={`w-12 h-12 rounded-full ${BUBBLE} grid place-items-center active:scale-90 transition-smooth shrink-0`}
         >
-          <HomeIcon className={`w-5 h-5 ${colorClass(isHome)}`} />
+          <HomeIcon filled={isHome} className={`w-5 h-5 ${colorClass(isHome)}`} />
         </Link>
 
         <motion.div layout transition={{ type: "spring", stiffness: 380, damping: 30 }} className="shrink-0">
