@@ -22,7 +22,10 @@ export const BottomNav = () => {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border pb-safe">
+    <nav
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
+    >
       <div className="flex items-center justify-evenly h-16 w-full px-2">
         {navLinks.map((link) => {
           const Icon = link.icon;
@@ -31,7 +34,8 @@ export const BottomNav = () => {
             <Link
               key={link.href}
               href={link.href}
-              className="relative flex flex-col items-center justify-center w-full h-full gap-1 transition-smooth active:scale-95"
+              aria-label={link.label}
+              className="relative flex items-center justify-center w-full h-full transition-smooth active:scale-95"
             >
               <div className="relative">
                 {link.label === "Cart" ? (
@@ -61,11 +65,6 @@ export const BottomNav = () => {
                   </span>
                 )}
               </div>
-              <span
-                className="text-[10px] text-foreground transition-all font-medium"
-              >
-                {link.label}
-              </span>
             </Link>
           );
         })}
