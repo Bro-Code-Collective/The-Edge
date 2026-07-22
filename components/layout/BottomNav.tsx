@@ -5,15 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { useCart } from "@/store/cart";
-
-type IconVariant = { black: string; white: string };
-
-const DualIcon = ({ icon, label, className = "w-5 h-5" }: { icon: IconVariant; label: string; className?: string }) => (
-  <>
-    <img src={icon.black} alt={label} className={`${className} dark:hidden object-contain`} loading="eager" decoding="sync" />
-    <img src={icon.white} alt={label} className={`hidden ${className} dark:block object-contain`} loading="eager" decoding="sync" />
-  </>
-);
+import { HomeIcon, SearchIcon, CartIcon, ProfileIcon } from "@/components/ui/NavIcons";
 
 export const BottomNav = () => {
   const count = useCart((s) => s.count());
@@ -29,21 +21,7 @@ export const BottomNav = () => {
   const isCart = pathname === "/cart";
   const isProfile = pathname === "/profile";
 
-  const homeIcon: IconVariant = isHome
-    ? { black: "/icons/home-filled-black.svg", white: "/icons/home-filled-white.svg" }
-    : { black: "/icons/home-line-black.svg", white: "/icons/home-line-white.svg" };
-
-  const browseIcon: IconVariant = isBrowse
-    ? { black: "/icons/search-filled-black.svg", white: "/icons/search-filled-white.svg" }
-    : { black: "/icons/search-line-black.svg", white: "/icons/search-line-white.svg" };
-
-  const cartIcon: IconVariant = isCart
-    ? { black: "/icons/cart-solid-black.svg", white: "/icons/cart-solid-white.svg" }
-    : { black: "/icons/cart-new-black.svg", white: "/icons/cart-new-white.svg" };
-
-  const profileIcon: IconVariant = isProfile
-    ? { black: "/images/profile-black.svg", white: "/images/profile-white.svg" }
-    : { black: "/icons/profile-line-black.svg", white: "/icons/profile-line-white.svg" };
+  const colorClass = (active: boolean) => (active ? "text-foreground" : "text-muted-foreground");
 
   return (
     <div
@@ -56,7 +34,7 @@ export const BottomNav = () => {
           aria-label="Home"
           className="w-11 h-11 rounded-full grid place-items-center active:scale-90 transition-smooth shrink-0"
         >
-          <DualIcon icon={homeIcon} label="Home" />
+          <HomeIcon className={`w-5 h-5 ${colorClass(isHome)}`} />
         </Link>
 
         <motion.div layout transition={{ type: "spring", stiffness: 380, damping: 30 }} className="shrink-0">
@@ -67,7 +45,7 @@ export const BottomNav = () => {
               mounted ? "px-5 bg-secondary/70" : "w-11"
             }`}
           >
-            <DualIcon icon={browseIcon} label="Search" />
+            <SearchIcon filled={isBrowse} className={`w-5 h-5 shrink-0 ${colorClass(isBrowse)}`} />
             {mounted && (
               <motion.span
                 initial={{ opacity: 0, x: -6 }}
@@ -86,7 +64,7 @@ export const BottomNav = () => {
           aria-label="Cart"
           className="relative w-11 h-11 rounded-full grid place-items-center active:scale-90 transition-smooth shrink-0"
         >
-          <DualIcon icon={cartIcon} label="Cart" />
+          <CartIcon filled={isCart} className={`w-5 h-5 ${colorClass(isCart)}`} />
           {mounted && count > 0 && (
             <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground animate-scale-in">
               {count}
@@ -99,7 +77,7 @@ export const BottomNav = () => {
           aria-label="Profile"
           className="w-11 h-11 rounded-full grid place-items-center active:scale-90 transition-smooth shrink-0"
         >
-          <DualIcon icon={profileIcon} label="Profile" />
+          <ProfileIcon filled={isProfile} className={`w-5 h-5 ${colorClass(isProfile)}`} />
         </Link>
       </div>
 
