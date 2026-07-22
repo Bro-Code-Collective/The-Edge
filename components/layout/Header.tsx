@@ -34,8 +34,8 @@ export const Header = () => {
 
   return (
     <header
-      className={`hidden md:block fixed w-full top-0 z-40 transition-all duration-100 border-b ${
-        scrolled ? "bg-background border-border" : "bg-transparent border-transparent"
+      className={`hidden md:block fixed w-full top-0 z-40 transition-all duration-100 border-b bg-background ${
+        scrolled ? "border-border" : "border-transparent"
       }`}
     >
       <div className="container mx-auto px-4 flex items-center justify-between h-14">

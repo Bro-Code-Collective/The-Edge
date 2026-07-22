@@ -79,7 +79,7 @@ export default function ProfilePage() {
   const progress = Math.min(100, ((profile?.totalOrders || 0) / tierInfo.next) * 100);
 
   return (
-    <div className="flex-1 bg-[#F8F9FA] dark:bg-background flex flex-col">
+    <div className="flex-1 bg-background flex flex-col">
       <main className="container mx-auto px-4 py-8 md:pt-28 md:py-12 pb-24 flex-1">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-8 lg:gap-12">
           
