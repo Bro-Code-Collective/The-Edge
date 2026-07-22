@@ -2,23 +2,52 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Home, Compass, ShoppingBag, User } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useCart } from "@/store/cart";
-import { motion } from "framer-motion";
+
+type IconVariant = { black: string; white: string };
 
 export const BottomNav = () => {
   const count = useCart((s) => s.count());
+  const pathname = usePathname();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
-  const navLinks = [
-    { href: "/", label: "Home", icon: Home },
-    { href: "/browse", label: "Browse", icon: Compass },
-    { href: "/cart", label: "Cart", icon: ShoppingBag, badge: true },
-    { href: "/profile", label: "Profile", icon: User },
+  const navLinks: {
+    href: string;
+    label: string;
+    badge?: boolean;
+    active: IconVariant;
+    inactive: IconVariant;
+  }[] = [
+    {
+      href: "/",
+      label: "Home",
+      active: { black: "/icons/home-filled-black.svg", white: "/icons/home-filled-white.svg" },
+      inactive: { black: "/icons/home-line-black.svg", white: "/icons/home-line-white.svg" },
+    },
+    {
+      href: "/browse",
+      label: "Browse",
+      active: { black: "/icons/search-filled-black.svg", white: "/icons/search-filled-white.svg" },
+      inactive: { black: "/icons/search-line-black.svg", white: "/icons/search-line-white.svg" },
+    },
+    {
+      href: "/cart",
+      label: "Cart",
+      badge: true,
+      active: { black: "/icons/cart-solid-black.svg", white: "/icons/cart-solid-white.svg" },
+      inactive: { black: "/icons/cart-new-black.svg", white: "/icons/cart-new-white.svg" },
+    },
+    {
+      href: "/profile",
+      label: "Profile",
+      active: { black: "/images/profile-black.svg", white: "/images/profile-white.svg" },
+      inactive: { black: "/icons/profile-line-black.svg", white: "/icons/profile-line-white.svg" },
+    },
   ];
 
   return (
@@ -28,7 +57,8 @@ export const BottomNav = () => {
     >
       <div className="flex items-center justify-evenly h-16 w-full px-2">
         {navLinks.map((link) => {
-          const Icon = link.icon;
+          const isActive = pathname === link.href;
+          const icon = isActive ? link.active : link.inactive;
 
           return (
             <Link
@@ -38,27 +68,10 @@ export const BottomNav = () => {
               className="relative flex items-center justify-center w-full h-full transition-smooth active:scale-95"
             >
               <div className="relative">
-                {link.label === "Cart" ? (
-                  <div className="relative w-7 h-7 transition-all">
-                    <img src="/icons/cart-solid-black.svg" alt="Cart" className="w-full h-full dark:hidden object-contain" loading="eager" decoding="sync" />
-                    <img src="/icons/cart-solid-white.svg" alt="Cart" className="hidden w-full h-full dark:block object-contain" loading="eager" decoding="sync" />
-                  </div>
-                ) : link.label === "Profile" ? (
-                  <div className="relative w-7 h-7 transition-all">
-                    <img src="/images/profile-black.svg" alt="Profile" className="w-full h-full dark:hidden object-contain" loading="eager" decoding="sync" />
-                    <img src="/images/profile-white.svg" alt="Profile" className="hidden w-full h-full dark:block object-contain" loading="eager" decoding="sync" />
-                  </div>
-                ) : link.label === "Home" ? (
-                  <div className="relative w-7 h-7 transition-all">
-                    <img src="/icons/home-black.svg" alt="Home" className="w-full h-full dark:hidden object-contain" loading="eager" decoding="sync" />
-                    <img src="/icons/home-white.svg" alt="Home" className="hidden w-full h-full dark:block object-contain" loading="eager" decoding="sync" />
-                  </div>
-                ) : (
-                  <Icon
-                    className="w-5 h-5 text-muted-foreground transition-all"
-                    strokeWidth={2}
-                  />
-                )}
+                <div className="relative w-7 h-7 transition-all">
+                  <img src={icon.black} alt={link.label} className="w-full h-full dark:hidden object-contain" loading="eager" decoding="sync" />
+                  <img src={icon.white} alt={link.label} className="hidden w-full h-full dark:block object-contain" loading="eager" decoding="sync" />
+                </div>
                 {link.badge && mounted && count > 0 && (
                   <span className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground animate-scale-in">
                     {count}
