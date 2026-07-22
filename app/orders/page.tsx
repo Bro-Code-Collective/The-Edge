@@ -7,7 +7,7 @@ import { ArrowRight, Clock, CheckCircle2, RotateCcw, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/store/cart";
 import { toast } from "sonner";
-import { displayReferenceNumber } from "@/lib/mockData";
+import { displayReferenceNumber } from "@/lib/types";
 import { useUserOrders, useSupabaseUser } from "@/lib/supabase/hooks";
 
 type TimeFilter = "all" | "today" | "week" | "month";

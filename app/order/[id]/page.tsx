@@ -111,7 +111,9 @@ export default function OrderStatusPage() {
       shopName: liveOrder.shopName || "Campus vendor",
       shopEmoji: liveOrder.shopEmoji || "🍽️",
       shopBanner: liveOrder.shopBanner,
-      customerName: liveOrder.customerName || "Guest",
+      customerName: (liveOrder.customerName && liveOrder.customerName !== "Guest") 
+        ? liveOrder.customerName 
+        : (user?.user_metadata?.full_name || user?.user_metadata?.name || (user?.email ? user.email.split('@')[0] : "Customer")),
       items: liveOrder.items.map((item: any) => ({
         id: item.id,
         title: item.title,

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { displayReferenceNumber, type PerShopOrder } from "@/lib/mockData";
+import { displayReferenceNumber, type PerShopOrder } from "@/lib/types";
 
 export function ReceiptCard({ order }: { order: PerShopOrder }) {
   const formattedDate = new Date(order.placedAt).toLocaleDateString("en-US", {

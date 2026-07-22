@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Clock, ArrowRight, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useSupabaseUser, useUserOrders } from "@/lib/supabase/hooks";
-import type { OrderStatus } from "@/lib/mockData";
+import type { OrderStatus } from "@/lib/types";
 
 const notifyingStatuses = new Set<OrderStatus>(["paid", "preparing", "ready", "customer_late"]);
 
