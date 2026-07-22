@@ -31,12 +31,21 @@ function GoogleIcon() {
   );
 }
 
-export function GoogleSignInButton({ 
-  callbackNextPath, 
-  mode = "signup" 
-}: { 
+export function GoogleSignInButton({
+  callbackNextPath,
+  mode = "signup",
+  loginHint,
+  label,
+  variant = "default",
+}: {
   callbackNextPath?: string;
   mode?: "login" | "signup";
+  /** Pre-fill/pre-select this Google account, skipping the full account chooser when possible. */
+  loginHint?: string;
+  /** Override the default button label. */
+  label?: string;
+  /** "default" shows the Google icon + full styling; "subtle" is a plain text link (for "use another account"). */
+  variant?: "default" | "subtle";
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -62,10 +71,15 @@ export function GoogleSignInButton({
         provider: "google",
         options: {
           redirectTo: callbackUrl.toString(),
-          queryParams: {
-            access_type: "offline",
-            prompt: "select_account",
-          },
+          queryParams: loginHint
+            ? {
+                access_type: "offline",
+                login_hint: loginHint,
+              }
+            : {
+                access_type: "offline",
+                prompt: "select_account",
+              },
         },
       });
 
@@ -78,6 +92,28 @@ export function GoogleSignInButton({
       setLoading(false);
     }
   };
+
+  const defaultLabel = mode === "login" ? "Log in with Google" : "Sign up with Google";
+
+  if (variant === "subtle") {
+    return (
+      <div className="space-y-2">
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          disabled={loading}
+          className="w-full text-center text-sm font-bold text-muted-foreground hover:text-foreground transition-colors disabled:opacity-60"
+        >
+          {loading ? "Opening Google..." : label || defaultLabel}
+        </button>
+        {error && (
+          <p className="text-center text-xs text-destructive" role="alert">
+            {error}
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
@@ -92,7 +128,7 @@ export function GoogleSignInButton({
           <GoogleIcon />
         </span>
         <span className="relative">
-          {loading ? "Opening Google..." : mode === "login" ? "Log in with Google" : "Sign up with Google"}
+          {loading ? "Opening Google..." : label || defaultLabel}
         </span>
         {!loading && (
           <ArrowRight className="relative h-4 w-4 text-muted-foreground" />

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { setLastAccount } from "@/lib/lastAccount";
 import {
   createOrder,
   fetchAllMenuItems,
@@ -392,6 +393,12 @@ export function useSupabaseUser() {
     queryFn: async () => {
       if (!supabase) return null;
       const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        setLastAccount({
+          email: user.email,
+          name: user.user_metadata?.full_name || user.user_metadata?.name || undefined,
+        });
+      }
       return user;
     },
     staleTime: 5 * 60 * 1000,
