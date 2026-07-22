@@ -15,7 +15,7 @@ export const Header = () => {
 
   React.useEffect(() => {
     setMounted(true);
-    
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
@@ -24,7 +24,7 @@ export const Header = () => {
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [pathname]);
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -32,15 +32,13 @@ export const Header = () => {
     { href: "/orders", label: "Orders" },
   ];
 
-  const isHome = pathname === "/";
-
   return (
     <header
       className={`hidden md:block fixed w-full top-0 z-40 transition-all duration-100 border-b ${
-        !isHome || scrolled ? "bg-background" : "bg-transparent"
-      } ${scrolled ? "border-border" : "border-transparent"}`}
+        scrolled ? "bg-background border-border" : "bg-transparent border-transparent"
+      }`}
     >
-      <div className="container mx-auto px-4 flex items-center justify-between h-12">
+      <div className="container mx-auto px-4 flex items-center justify-between h-16">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group" id="header-logo">
           <span className="font-bold tracking-tight text-xl">The Edge</span>
