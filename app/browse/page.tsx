@@ -260,7 +260,7 @@ function BrowseContent() {
                     setMinPrice("");
                     setMaxPrice("");
                   }}
-                  className="w-full pill border border-border py-2 text-sm text-muted-foreground hover:bg-secondary transition-smooth focus-dashed"
+                  className="w-full pill shadow-soft py-2 text-sm text-muted-foreground hover:bg-secondary transition-smooth focus-dashed"
                 >
                   Clear all filters
                 </button>

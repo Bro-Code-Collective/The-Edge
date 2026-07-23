@@ -48,7 +48,7 @@ export function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-background border-l border-border flex flex-col"
+            className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-background shadow-elevated flex flex-col"
           >
             <div className="flex items-center justify-between px-6 py-5 border-b border-border shrink-0">
               <h2 className="text-lg font-bold tracking-tight">Your cart</h2>
@@ -70,7 +70,7 @@ export function CartDrawer() {
             </div>
 
             <div className="shrink-0 border-t border-border p-6 space-y-4">
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-secondary/50 border border-border/50">
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-secondary/50 shadow-soft">
                 <AlertCircle className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                 <p className="text-[11px] leading-relaxed text-muted-foreground">
                   You will be redirected to process payments for each shop one after another.

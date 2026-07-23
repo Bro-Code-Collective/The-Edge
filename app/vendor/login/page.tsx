@@ -65,7 +65,7 @@ export default function VendorLoginPage() {
 
               <div className="space-y-6">
                 {user && shops.length > 0 ? (
-                  <div className="p-5 rounded-3xl bg-card border border-border space-y-4">
+                  <div className="p-5 rounded-3xl bg-card shadow-soft space-y-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold">
                         <Store className="w-5 h-5" />
@@ -121,7 +121,7 @@ export default function VendorLoginPage() {
           transition={{ duration: 1, delay: 0.2 }}
           className="hidden lg:flex flex-1 relative p-6 bg-secondary/30 dark:bg-black/50 overflow-hidden"
         >
-          <div className="relative w-full h-full overflow-hidden rounded-[2.5rem] border border-border group">
+          <div className="relative w-full h-full overflow-hidden rounded-[2.5rem] shadow-soft group">
             <Image
               src="/images/vendor-hero.png"
               alt="Professional Kitchen"

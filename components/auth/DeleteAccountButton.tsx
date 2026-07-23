@@ -69,7 +69,7 @@ export function DeleteAccountButton({
               initial={{ y: 40, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 40, opacity: 0 }}
-              className="w-full max-w-md bg-background border border-border rounded-[2.5rem] p-6 sm:p-8"
+              className="w-full max-w-md bg-background shadow-elevated rounded-[2.5rem] p-6 sm:p-8"
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold tracking-tight text-destructive">Delete account?</h3>

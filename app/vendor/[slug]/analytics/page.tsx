@@ -305,7 +305,7 @@ export default function VendorAnalyticsPage() {
   if (!user || !shop) {
     return (
       <div className="flex-1 grid place-items-center bg-background text-foreground min-h-screen px-4">
-        <div className="max-w-md rounded-3xl border border-border bg-card p-8 text-center">
+        <div className="max-w-md rounded-3xl shadow-soft bg-card p-8 text-center">
           <h1 className="text-2xl font-bold tracking-tight">Access Restricted</h1>
           <p className="text-muted-foreground mt-3 text-sm">Please sign in as an authorized shop vendor to view analytics.</p>
           <Link href="/vendor/login" className="mt-6 inline-flex px-6 py-2.5 rounded-full bg-primary text-primary-foreground font-bold text-sm">
@@ -319,14 +319,14 @@ export default function VendorAnalyticsPage() {
   return (
     <div className="h-screen w-full bg-background text-foreground flex overflow-hidden font-sans">
       {/* ── DESKTOP SIDEBAR ── */}
-      <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-border bg-card/60 h-full z-30">
+      <aside className="hidden lg:flex w-64 shrink-0 flex-col shadow-elevated bg-card/60 h-full z-30">
         <div className="p-6 border-b border-border bg-card/50">
           <Link href="/" className="flex items-center gap-2 mb-8">
             <div className="w-8 h-8 rounded-xl hero-gradient grid place-items-center text-white font-bold text-sm">E</div>
             <span className="font-bold tracking-tight">The Edge</span>
           </Link>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-secondary border border-border grid place-items-center text-2xl">
+            <div className="w-12 h-12 rounded-2xl bg-secondary shadow-soft grid place-items-center text-2xl">
               {shop.emoji}
             </div>
             <div className="min-w-0">
@@ -385,7 +385,7 @@ export default function VendorAnalyticsPage() {
       {/* ── MAIN CONTENT ── */}
       <main className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto bg-background/50">
         {/* Mobile Navigation Header */}
-        <header className="lg:hidden bg-card border-b border-border p-4 sticky top-0 z-20">
+        <header className="lg:hidden bg-card shadow-elevated p-4 sticky top-0 z-20">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <div className="text-xl">{shop.emoji}</div>
@@ -443,7 +443,7 @@ export default function VendorAnalyticsPage() {
               <button
                 onClick={handleRefresh}
                 disabled={isRefreshing}
-                className="w-10 h-10 rounded-full bg-card border border-border grid place-items-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all shadow-sm"
+                className="w-10 h-10 rounded-full bg-card border border-transparent grid place-items-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all shadow-soft"
                 title="Refresh Analytics"
               >
                 <RotateCcw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-primary" : ""}`} />
@@ -454,7 +454,7 @@ export default function VendorAnalyticsPage() {
                 <select
                   value={period}
                   onChange={(e) => setPeriod(e.target.value as Period)}
-                  className="appearance-none bg-card border border-border text-foreground text-sm font-semibold rounded-full px-4 py-2.5 pr-9 hover:border-foreground/30 cursor-pointer focus:outline-none shadow-sm"
+                  className="appearance-none bg-card border border-transparent text-foreground text-sm font-semibold rounded-full px-4 py-2.5 pr-9 hover:border-foreground/30 cursor-pointer focus:outline-none shadow-soft"
                 >
                   <option value="monthly">Monthly</option>
                   <option value="weekly">Weekly</option>
@@ -478,7 +478,7 @@ export default function VendorAnalyticsPage() {
           {/* ── KPI METRIC CARDS (100% REAL COMPUTED METRICS) ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Card 1: Revenue */}
-            <motion.div whileHover={{ y: -2 }} className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+            <motion.div whileHover={{ y: -2 }} className="bg-card rounded-2xl p-5 shadow-soft">
               <div className="text-muted-foreground text-sm font-medium">Revenue</div>
               <div className="flex items-center justify-between mt-3">
                 <div className="text-3xl font-extrabold tracking-tight">
@@ -491,7 +491,7 @@ export default function VendorAnalyticsPage() {
             </motion.div>
 
             {/* Card 2: Expenses */}
-            <motion.div whileHover={{ y: -2 }} className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+            <motion.div whileHover={{ y: -2 }} className="bg-card rounded-2xl p-5 shadow-soft">
               <div className="text-muted-foreground text-sm font-medium">Expenses</div>
               <div className="flex items-center justify-between mt-3">
                 <div className="text-3xl font-extrabold tracking-tight">
@@ -504,7 +504,7 @@ export default function VendorAnalyticsPage() {
             </motion.div>
 
             {/* Card 3: Sales */}
-            <motion.div whileHover={{ y: -2 }} className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+            <motion.div whileHover={{ y: -2 }} className="bg-card rounded-2xl p-5 shadow-soft">
               <div className="text-muted-foreground text-sm font-medium">Sales</div>
               <div className="flex items-center justify-between mt-3">
                 <div className="text-3xl font-extrabold tracking-tight">
@@ -517,7 +517,7 @@ export default function VendorAnalyticsPage() {
             </motion.div>
 
             {/* Card 4: Profit */}
-            <motion.div whileHover={{ y: -2 }} className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+            <motion.div whileHover={{ y: -2 }} className="bg-card rounded-2xl p-5 shadow-soft">
               <div className="text-muted-foreground text-sm font-medium">Net Profit</div>
               <div className="flex items-center justify-between mt-3">
                 <div className="text-3xl font-extrabold tracking-tight">
@@ -533,7 +533,7 @@ export default function VendorAnalyticsPage() {
           {/* ── MAIN CHARTS ROW (SALES PERFORMANCE & TRAFFIC SOURCE) ── */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Chart 1: Sales Performance */}
-            <div className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-between shadow-sm">
+            <div className="bg-card rounded-2xl p-6 flex flex-col justify-between shadow-soft">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold tracking-tight">Sales Performance</h3>
@@ -594,7 +594,7 @@ export default function VendorAnalyticsPage() {
             </div>
 
             {/* Chart 2: Traffic & Order Channels */}
-            <div className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-between shadow-sm">
+            <div className="bg-card rounded-2xl p-6 flex flex-col justify-between shadow-soft">
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold tracking-tight">Order Channels & Acquisition</h3>
@@ -653,7 +653,7 @@ export default function VendorAnalyticsPage() {
           {/* ── DEEP ANALYTICS ROW (TOP SELLING ITEMS & CATEGORY BREAKDOWN) ── */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Top Selling Products */}
-            <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6 shadow-sm">
+            <div className="lg:col-span-2 bg-card rounded-2xl p-6 shadow-soft">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-bold tracking-tight">Top Performing Menu Items</h3>
@@ -701,7 +701,7 @@ export default function VendorAnalyticsPage() {
             </div>
 
             {/* Category Share Donut Chart with CRISP CONTRAST TOOLTIP */}
-            <div className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-between shadow-sm">
+            <div className="bg-card rounded-2xl p-6 flex flex-col justify-between shadow-soft">
               <div>
                 <h3 className="text-lg font-bold tracking-tight">Category Distribution</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">Real revenue split across menu categories</p>
@@ -760,7 +760,7 @@ export default function VendorAnalyticsPage() {
 
           {/* ── PEAK RUSH HOURS ── */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+            <div className="bg-card rounded-2xl p-6 shadow-soft">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-lg font-bold tracking-tight">Peak Order Rush Hours</h3>
@@ -797,29 +797,29 @@ export default function VendorAnalyticsPage() {
             </div>
 
             {/* Performance Summary */}
-            <div className="bg-card border border-border rounded-2xl p-6 flex flex-col justify-between shadow-sm">
+            <div className="bg-card rounded-2xl p-6 flex flex-col justify-between shadow-soft">
               <div>
                 <h3 className="text-lg font-bold tracking-tight">Store Metrics Summary</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">Real order velocity metrics</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 my-4">
-                <div className="p-4 rounded-xl bg-secondary/60 border border-border">
+                <div className="p-4 rounded-xl bg-secondary/60 shadow-soft">
                   <div className="text-xs text-muted-foreground font-medium">Recorded Revenue</div>
                   <div className="text-2xl font-extrabold mt-1">LKR {analyticsData.revenue.toLocaleString()}</div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-secondary/60 border border-border">
+                <div className="p-4 rounded-xl bg-secondary/60 shadow-soft">
                   <div className="text-xs text-muted-foreground font-medium">Order Count</div>
                   <div className="text-2xl font-extrabold mt-1">{analyticsData.salesCount}</div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-secondary/60 border border-border">
+                <div className="p-4 rounded-xl bg-secondary/60 shadow-soft">
                   <div className="text-xs text-muted-foreground font-medium">Active Menu Items</div>
                   <div className="text-2xl font-extrabold mt-1">{menuItems.length}</div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-secondary/60 border border-border">
+                <div className="p-4 rounded-xl bg-secondary/60 shadow-soft">
                   <div className="text-xs text-muted-foreground font-medium">Takeaway / Delivery</div>
                   <div className="text-2xl font-extrabold mt-1">{analyticsData.takeawayOrders}</div>
                 </div>

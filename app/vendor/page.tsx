@@ -31,7 +31,7 @@ export default function VendorHomePage() {
   if (!user) {
     return (
       <div className="min-h-screen bg-background grid place-items-center px-4">
-        <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 sm:p-8">
+        <div className="w-full max-w-md rounded-3xl shadow-soft bg-card p-6 sm:p-8">
           <div className="w-14 h-14 rounded-2xl bg-primary/10 grid place-items-center mb-5">
             <Lock className="w-7 h-7 text-primary" />
           </div>
@@ -50,7 +50,7 @@ export default function VendorHomePage() {
   if (shops.length === 0) {
     return (
       <div className="min-h-screen bg-background grid place-items-center px-4">
-        <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 sm:p-8 text-center">
+        <div className="w-full max-w-md rounded-3xl shadow-soft bg-card p-6 sm:p-8 text-center">
           <div className="w-16 h-16 rounded-2xl bg-secondary grid place-items-center mx-auto mb-5">
             <Store className="w-8 h-8 text-muted-foreground" />
           </div>
@@ -69,7 +69,7 @@ export default function VendorHomePage() {
             >
               {isSigningOut ? "Signing out..." : "Sign out"}
             </button>
-            <Link href="/" className="pill border border-border px-6 py-2.5 text-sm font-bold">
+            <Link href="/" className="pill shadow-soft px-6 py-2.5 text-sm font-bold">
               Back home
             </Link>
           </div>
@@ -86,7 +86,7 @@ export default function VendorHomePage() {
           <button
             onClick={signOut}
             disabled={isSigningOut}
-            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-destructive disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-full shadow-soft px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-destructive disabled:opacity-50"
           >
             <Power className="w-4 h-4" />
             {isSigningOut ? "Signing out..." : "Sign out"}
@@ -97,7 +97,7 @@ export default function VendorHomePage() {
             <Link
               key={shop.id}
               href={`/vendor/${shop.slug}`}
-              className="flex items-center justify-between rounded-3xl border border-border bg-card p-5 hover:bg-secondary transition-colors"
+              className="flex items-center justify-between rounded-3xl shadow-soft bg-card p-5 hover:bg-secondary transition-colors"
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-secondary grid place-items-center text-2xl">

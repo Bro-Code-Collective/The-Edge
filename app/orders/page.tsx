@@ -170,7 +170,7 @@ export default function OrdersPage() {
             {filteredOrders.length > 0 && (
               <button
                 onClick={handleClearHistory}
-                className="pill border border-border px-3 py-1.5 text-xs font-bold focus-dashed hover:bg-secondary transition-colors shrink-0"
+                className="pill shadow-soft px-3 py-1.5 text-xs font-bold focus-dashed hover:bg-secondary transition-colors shrink-0"
               >
                 Clear history
               </button>
@@ -198,7 +198,7 @@ export default function OrdersPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.3, delay: Math.min(idx * 0.05, 0.3) }}
-                  className="group rounded-3xl border border-border bg-card overflow-hidden"
+                  className="group rounded-3xl shadow-soft bg-card overflow-hidden"
                 >
                   {/* Shop banner strip */}
                   <div className="relative h-16 w-full overflow-hidden">
@@ -303,7 +303,7 @@ export default function OrdersPage() {
               </div>
             )}
 
-            <section className="mt-6 rounded-3xl border border-border bg-card p-5">
+            <section className="mt-6 rounded-3xl shadow-soft bg-card p-5">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h2 className="font-bold tracking-tight">Total spend</h2>

@@ -204,7 +204,7 @@ export default function OrderStatusPage() {
         </div>
 
         {/* Progress timeline */}
-        <div className="rounded-3xl border border-border bg-card p-6">
+        <div className="rounded-3xl shadow-soft bg-card p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-semibold tracking-tight">Order status</h2>
           </div>

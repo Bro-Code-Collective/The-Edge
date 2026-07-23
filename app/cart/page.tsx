@@ -12,7 +12,7 @@ function OrderHistoryLink() {
   return (
     <Link
       href="/orders"
-      className="inline-flex items-center gap-1.5 pill border border-border px-3 py-1.5 text-xs font-bold hover:bg-secondary transition-colors focus-dashed shrink-0"
+      className="inline-flex items-center gap-1.5 pill shadow-soft px-3 py-1.5 text-xs font-bold hover:bg-secondary transition-colors focus-dashed shrink-0"
     >
       <ReceiptText className="w-3.5 h-3.5" /> Order history
     </Link>
@@ -80,7 +80,7 @@ export default function CartPage() {
 
         {/* Right: order summary */}
         <aside className="h-fit">
-          <div className="sticky top-24 rounded-[2.5rem] border border-border bg-card p-8">
+          <div className="sticky top-24 rounded-[2.5rem] shadow-soft bg-card p-8">
             <div className="label-mono mb-4 text-primary">Final Summary</div>
             <h2 className="text-2xl font-bold tracking-tight mb-6">
               Total Order
@@ -102,7 +102,7 @@ export default function CartPage() {
               })}
             </div>
 
-            <div className="p-4 rounded-2xl bg-secondary/50 flex items-start gap-3 mb-8 border border-border/50">
+            <div className="p-4 rounded-2xl bg-secondary/50 flex items-start gap-3 mb-8 shadow-soft">
               <AlertCircle className="w-4 h-4 text-primary mt-0.5 shrink-0" />
               <p className="text-[11px] leading-relaxed text-muted-foreground">
                 You will be redirected to process payments for each shop one after another. 
