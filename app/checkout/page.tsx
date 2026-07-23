@@ -122,7 +122,7 @@ export default function CheckoutPage() {
                   layout
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-3xl border border-border bg-card overflow-hidden"
+                  className="rounded-3xl shadow-soft bg-card overflow-hidden"
                 >
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
@@ -169,7 +169,7 @@ export default function CheckoutPage() {
 
         {/* Right: sticky order summary */}
         <aside className="h-fit">
-          <div className="sticky top-24 rounded-[2.5rem] border border-border bg-card p-8">
+          <div className="sticky top-24 rounded-[2.5rem] shadow-soft bg-card p-8">
             <div className="label-mono mb-4 text-primary">Order Summary</div>
 
             <div className="space-y-4 mb-8">
@@ -217,7 +217,7 @@ export default function CheckoutPage() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="w-full max-w-md bg-card border border-border rounded-t-[2.5rem] sm:rounded-[2.5rem] overflow-hidden"
+              className="w-full max-w-md bg-card shadow-elevated rounded-t-[2.5rem] sm:rounded-[2.5rem] overflow-hidden"
             >
               <div className="p-8">
                 <div className="flex justify-between items-start mb-6">

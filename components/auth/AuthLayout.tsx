@@ -77,7 +77,7 @@ export function AuthLayout({ initialMode: propMode }: AuthLayoutProps) {
                   </p>
                   
                   {/* Mode Toggle */}
-                  <div className="flex bg-secondary p-1 rounded-full border border-border">
+                  <div className="flex bg-secondary p-1 rounded-full shadow-soft">
                     <Link 
                       href="/login"
                       onClick={(e) => {
@@ -163,17 +163,6 @@ export function AuthLayout({ initialMode: propMode }: AuthLayoutProps) {
                   <GoogleSignInButton mode={authMode} />
                 )}
                 
-                {authMode === "login" ? (
-                  <p className="text-center text-sm text-muted-foreground">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="text-primary font-bold hover:underline">Sign up</Link>
-                  </p>
-                ) : (
-                  <p className="text-center text-sm text-muted-foreground">
-                    Already have an account?{" "}
-                    <Link href="/login" className="text-primary font-bold hover:underline">Log in</Link>
-                  </p>
-                )}
               </div>
 
               {/* Removed terms and privacy text */}
@@ -196,7 +185,7 @@ export function AuthLayout({ initialMode: propMode }: AuthLayoutProps) {
           }}
           className="hidden lg:flex flex-1 relative p-6 bg-secondary dark:bg-black overflow-hidden"
         >
-          <div className="relative w-full h-full overflow-hidden rounded-[2.5rem] border border-border group">
+          <div className="relative w-full h-full overflow-hidden rounded-[2.5rem] shadow-soft group">
             <Image
               src="/images/auth-hero.png"
               alt="The Edge Campus Food"

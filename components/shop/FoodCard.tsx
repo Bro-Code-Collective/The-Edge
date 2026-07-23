@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { Check, Heart, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { MenuItem } from "@/lib/types";
@@ -47,9 +48,6 @@ export const FoodCard = ({ item, compact = false, shopName }: FoodCardProps) => 
     toggleFavorite.mutate(
       { userId, menuItemId: item.id, isFavorite: fav },
       {
-        onSuccess: () => {
-          toast(nextFav ? "Added to favorites" : "Removed from favorites");
-        },
         onError: () => {
           setOptimisticFav(null);
           toast.error("Could not update favorites");
@@ -60,7 +58,7 @@ export const FoodCard = ({ item, compact = false, shopName }: FoodCardProps) => 
 
   return (
     <article className="group relative h-full min-h-[300px] transition-smooth rounded-3xl cursor-default">
-      <div className="relative rounded-3xl bg-card border border-border overflow-hidden h-full flex flex-col">
+      <div className="relative rounded-3xl bg-card shadow-soft overflow-hidden h-full flex flex-col">
         {/* Image */}
         <div className="relative aspect-[5/3] overflow-hidden bg-muted flex-shrink-0">
           <Image
@@ -87,19 +85,28 @@ export const FoodCard = ({ item, compact = false, shopName }: FoodCardProps) => 
           <div className="min-w-0 mb-2">
             <div className="flex items-start gap-2">
               <h3 className="min-w-0 flex-1 font-bold text-sm tracking-tight truncate leading-tight">{item.title}</h3>
-              <button
+              <motion.button
                 id={`fav-btn-${item.id}`}
                 onClick={handleFavorite}
                 disabled={toggleFavorite.isPending}
+                whileTap={{ scale: 0.8 }}
                 aria-label={fav ? "Remove from favorites" : "Add to favorites"}
                 className="w-9 h-9 rounded-full grid place-items-center focus-dashed transition-smooth hover:bg-secondary disabled:opacity-60 shrink-0"
               >
-                <Heart
-                  className={`w-5 h-5 ${
-                    fav ? "fill-red-500 text-red-500" : "text-muted-foreground"
-                  }`}
-                />
-              </button>
+                <motion.span
+                  key={fav ? "on" : "off"}
+                  initial={{ scale: 0.6 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                  className="block"
+                >
+                  <Heart
+                    className={`w-5 h-5 ${
+                      fav ? "fill-red-500 text-red-500" : "text-muted-foreground"
+                    }`}
+                  />
+                </motion.span>
+              </motion.button>
             </div>
             <div className="h-5 -mt-0.5">
               {dietLabel && (

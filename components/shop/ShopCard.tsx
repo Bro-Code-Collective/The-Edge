@@ -62,7 +62,7 @@ export const ShopCard = ({ shop }: ShopCardProps) => {
       <Link
         href={`/shop/${shop.slug}`}
         id={`shop-card-${shop.id}`}
-        className="flex flex-col h-full rounded-3xl border border-border bg-card overflow-hidden focus-dashed"
+        className="flex flex-col h-full rounded-3xl shadow-soft bg-card overflow-hidden focus-dashed"
       >
         {/* Banner Image Area */}
         <div className="relative h-[90px] w-full flex-shrink-0 bg-secondary overflow-hidden">

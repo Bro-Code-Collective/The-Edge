@@ -909,6 +909,7 @@ export type UserProfile = {
   email: string;
   avatarUrl?: string;
   totalOrders: number;
+  createdAt: string;
 };
 
 export async function fetchProfile(userId: string): Promise<UserProfile | null> {
@@ -928,6 +929,7 @@ export async function fetchProfile(userId: string): Promise<UserProfile | null> 
     email: data.email,
     avatarUrl: data.avatar_url ?? undefined,
     totalOrders: data.total_orders,
+    createdAt: data.created_at,
   };
 }
 

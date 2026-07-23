@@ -12,7 +12,7 @@ export function ReceiptCard({ order }: { order: PerShopOrder }) {
   });
 
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-card border border-border text-base">
+    <div className="relative rounded-2xl overflow-hidden bg-card shadow-soft text-base">
       {/* Shop banner header */}
       <div className="relative h-28 sm:h-32 w-full overflow-hidden">
         {order.shopBanner ? (

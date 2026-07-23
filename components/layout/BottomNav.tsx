@@ -8,7 +8,7 @@ import { useCart } from "@/store/cart";
 import { HomeIcon, SearchIcon, CartIcon, ProfileIcon } from "@/components/ui/NavIcons";
 
 const BUBBLE =
-  "bg-white dark:bg-neutral-900 shadow-[0_8px_24px_rgba(0,0,0,0.15)] border border-black/5 dark:border-white/10";
+  "bg-white dark:bg-neutral-900 shadow-[0_8px_24px_rgba(0,0,0,0.15)]";
 
 export const BottomNav = () => {
   const count = useCart((s) => s.count());
@@ -31,6 +31,8 @@ export const BottomNav = () => {
       className="md:hidden fixed bottom-0 inset-x-0 z-50 flex flex-col items-center gap-2 pointer-events-none"
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
     >
+      <div className="absolute inset-x-0 bottom-0 h-32 -z-10 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none" />
+
       <div className="flex items-center gap-3 pointer-events-auto">
         <Link
           href="/"

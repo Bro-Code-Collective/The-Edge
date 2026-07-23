@@ -43,8 +43,8 @@ export function CartItemRow({ entry }: { entry: CartEntry }) {
           className="mt-2 w-full text-xs px-4 py-2.5 rounded-xl bg-secondary/50 placeholder:text-muted-foreground focus:ring-1 focus:ring-primary focus:bg-background outline-none transition-all"
         />
 
-        <div className="mt-4 flex items-center justify-between gap-4 flex-wrap">
-          <div className="inline-flex rounded-full bg-secondary/80 p-1 text-[10px] font-bold uppercase tracking-wider border border-border">
+        <div className="mt-2 flex items-center justify-between gap-4 flex-wrap">
+          <div className="inline-flex rounded-full bg-secondary/80 p-1 text-[10px] font-bold uppercase tracking-wider shadow-soft">
             {(["takeaway", "dine-in"] as const).map((type) => (
               <button
                 key={type}
@@ -60,7 +60,7 @@ export function CartItemRow({ entry }: { entry: CartEntry }) {
             ))}
           </div>
 
-          <div className="inline-flex items-center rounded-full bg-background border border-border overflow-hidden">
+          <div className="inline-flex items-center rounded-full bg-background shadow-soft overflow-hidden">
             <button
               onClick={() => setQty(c.item.id, c.qty - 1)}
               className="w-8 h-8 grid place-items-center hover:bg-secondary transition-colors"

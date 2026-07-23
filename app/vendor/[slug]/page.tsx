@@ -336,7 +336,7 @@ export default function VendorDashboard() {
   if (!user) {
     return (
       <div className="flex-1 grid place-items-center bg-background px-4">
-        <div className="max-w-md rounded-3xl border border-border bg-card p-8 text-center">
+        <div className="max-w-md rounded-3xl shadow-soft bg-card p-8 text-center">
           <h1 className="text-2xl font-bold tracking-tight">Vendor sign in required</h1>
           <p className="text-muted-foreground mt-3">Use the Google account approved for this shop.</p>
           <Link href="/vendor/login" className="pill bg-foreground text-background px-6 py-2.5 text-sm font-bold inline-flex mt-6">
@@ -350,7 +350,7 @@ export default function VendorDashboard() {
   if (!shop) {
     return (
       <div className="flex-1 grid place-items-center bg-background px-4">
-        <div className="max-w-md rounded-3xl border border-border bg-card p-8 text-center">
+        <div className="max-w-md rounded-3xl shadow-soft bg-card p-8 text-center">
           <h1 className="text-2xl font-bold tracking-tight">No approved access</h1>
           <p className="text-muted-foreground mt-3">
             This shop is not approved for your Google account, or the shop does not exist.
@@ -373,7 +373,7 @@ export default function VendorDashboard() {
             <span className="font-bold tracking-tight">The Edge</span>
           </Link>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-secondary border border-border grid place-items-center text-2xl">{shop.emoji}</div>
+            <div className="w-12 h-12 rounded-2xl bg-secondary shadow-soft grid place-items-center text-2xl">{shop.emoji}</div>
             <div className="min-w-0">
               <div className="font-bold truncate text-sm">{shop.name}</div>
               <div className={`text-[10px] flex items-center gap-1.5 font-bold uppercase tracking-wider ${shop.isOpen ? "text-success" : "text-muted-foreground"}`}>
@@ -497,7 +497,7 @@ export default function VendorDashboard() {
           
           <div className="flex items-center gap-4">
             {tab === "orders" && (
-              <div className="flex items-center gap-1 bg-secondary/50 rounded-full p-1 border border-border">
+              <div className="flex items-center gap-1 bg-secondary/50 rounded-full p-1 shadow-soft">
                 {["today", "week", "month"].map((f) => (
                   <button
                     key={f}
@@ -595,7 +595,7 @@ export default function VendorDashboard() {
                     initial={{ x: 20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: 20, opacity: 0 }}
-                    className="hidden lg:block w-[400px] bg-background border border-border rounded-[2.5rem] p-6 sticky top-0 h-fit"
+                    className="hidden lg:block w-[400px] bg-background shadow-elevated rounded-[2.5rem] p-6 sticky top-0 h-fit"
                   >
                     <div className="flex justify-between items-center mb-6">
                       <h3 className="font-bold uppercase tracking-widest text-xs text-muted-foreground">Receipt Preview</h3>
@@ -641,7 +641,7 @@ export default function VendorDashboard() {
 
               <div className="grid gap-4">
                 {menuItems.map((item) => (
-                  <div key={item.id} className="rounded-3xl border border-border bg-card p-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div key={item.id} className="rounded-3xl shadow-soft bg-card p-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-bold tracking-tight text-lg">{item.title}</span>
@@ -739,7 +739,7 @@ export default function VendorDashboard() {
               </div>
 
               {/* Store Status */}
-              <div className="rounded-3xl border border-border bg-card p-5 flex items-center justify-between">
+              <div className="rounded-3xl shadow-soft bg-card p-5 flex items-center justify-between">
                 <div>
                   <h3 className="font-bold text-sm">Store status</h3>
                   <p className="text-xs text-muted-foreground mt-1">
@@ -757,7 +757,7 @@ export default function VendorDashboard() {
               </div>
 
               {/* Closed Note */}
-              <div className="rounded-3xl border border-border bg-card p-5 space-y-3">
+              <div className="rounded-3xl shadow-soft bg-card p-5 space-y-3">
                 <h3 className="font-bold text-sm">Closed notice</h3>
                 <p className="text-xs text-muted-foreground">Shown to customers while your store is paused or outside hours.</p>
                 <div className="flex gap-2">
@@ -779,7 +779,7 @@ export default function VendorDashboard() {
               </div>
 
               {/* Operating Hours */}
-              <div className="rounded-3xl border border-border bg-card p-5 space-y-3">
+              <div className="rounded-3xl shadow-soft bg-card p-5 space-y-3">
                 <h3 className="font-bold text-sm">Operating hours</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
@@ -810,7 +810,7 @@ export default function VendorDashboard() {
               </div>
 
               {/* Shop Identity */}
-              <div className="rounded-3xl border border-border bg-card p-5 space-y-4">
+              <div className="rounded-3xl shadow-soft bg-card p-5 space-y-4">
                 <h3 className="font-bold text-sm">Shop details</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
@@ -925,7 +925,7 @@ export default function VendorDashboard() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-lg bg-background border border-border rounded-3xl p-6 space-y-5 max-h-[90vh] overflow-y-auto"
+              className="w-full max-w-lg bg-background shadow-elevated rounded-3xl p-6 space-y-5 max-h-[90vh] overflow-y-auto"
             >
               <div className="flex justify-between items-center border-b border-border pb-4">
                 <h3 className="font-bold text-lg">{editingItemId ? "Edit Menu Item" : "Add Menu Item"}</h3>
@@ -1039,7 +1039,7 @@ export default function VendorDashboard() {
                     className="rounded-2xl"
                   />
                   {itemForm.imageUrl && (
-                    <div className="relative h-24 w-full rounded-2xl overflow-hidden border border-border bg-secondary">
+                    <div className="relative h-24 w-full rounded-2xl overflow-hidden shadow-soft bg-secondary">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={itemForm.imageUrl} alt="Item Preview" className="w-full h-full object-cover" />
                     </div>
@@ -1096,7 +1096,7 @@ export default function VendorDashboard() {
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
                 exit={{ y: "100%" }}
-                className="w-full max-w-md bg-background border border-border rounded-t-[2.5rem] p-6 overflow-y-auto max-h-[90vh]"
+                className="w-full max-w-md bg-background shadow-elevated rounded-t-[2.5rem] p-6 overflow-y-auto max-h-[90vh]"
              >
                 <div className="flex justify-center mb-4">
                   <div className="w-12 h-1 bg-secondary rounded-full" />
@@ -1148,10 +1148,10 @@ function OrderCard({
     <motion.div 
       layout
       onClick={onClick}
-      className={`group relative rounded-3xl border p-5 cursor-pointer transition-all ${
-        isActive 
-          ? "bg-foreground text-background border-foreground z-10" 
-          : "bg-card border-border hover:border-primary/50"
+      className={`group relative rounded-3xl p-5 cursor-pointer transition-all ${
+        isActive
+          ? "bg-foreground text-background z-10"
+          : "bg-card shadow-soft border border-transparent hover:border-primary/50"
       }`}
     >
       <div className="flex items-center justify-between mb-3">

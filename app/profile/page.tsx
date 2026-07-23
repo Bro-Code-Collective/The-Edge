@@ -72,7 +72,7 @@ export default function ProfilePage() {
           
           {/* ── LEFT COLUMN (Profile Info) ── */}
           <aside className="w-full md:w-80 shrink-0">
-            <div className="bg-white dark:bg-card border border-border rounded-[2.5rem] p-8 sticky top-24 overflow-hidden">
+            <div className="bg-white dark:bg-card shadow-soft rounded-[2.5rem] p-8 sticky top-24 overflow-hidden">
               <div className="flex flex-col items-center text-center relative z-10">
                 <div className="relative mb-6 group">
                   <div className="w-32 h-32 overflow-hidden flex items-center justify-center">
@@ -120,7 +120,16 @@ export default function ProfilePage() {
                     </button>
                   </div>
                 </div>
-                <p className="text-muted-foreground text-sm font-medium mb-8">{user?.email}</p>
+                <p className="text-muted-foreground text-sm font-medium">{user?.email}</p>
+                {profileLoading ? (
+                  <Skeleton className="h-3 w-24 mt-2 mb-8" />
+                ) : (
+                  <p className="text-muted-foreground/70 text-[11px] font-medium mt-1 mb-8">
+                    {profile?.createdAt
+                      ? `Member since ${new Date(profile.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}`
+                      : " "}
+                  </p>
+                )}
 
                 <div className="w-full grid grid-cols-2 gap-4 border-y border-border py-6 mb-8">
                   <div className="space-y-1">
@@ -173,7 +182,7 @@ export default function ProfilePage() {
 
             <section>
               <h3 className="label-mono mb-4 ml-2">Appearance</h3>
-              <div className="bg-white dark:bg-card border border-border rounded-3xl overflow-hidden p-5 flex items-center justify-between">
+              <div className="bg-white dark:bg-card shadow-soft rounded-3xl overflow-hidden p-5 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-secondary/80 flex items-center justify-center">
                     <Moon className="w-6 h-6 text-muted-foreground" />
@@ -185,7 +194,7 @@ export default function ProfilePage() {
                 </div>
                 <ThemeToggle />
               </div>
-              <div className="md:hidden mt-3 bg-white dark:bg-card border border-border rounded-3xl overflow-hidden p-5 flex items-center justify-between">
+              <div className="md:hidden mt-3 bg-white dark:bg-card shadow-soft rounded-3xl overflow-hidden p-5 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-secondary/80 flex items-center justify-center">
                     <Sun className="w-6 h-6 text-muted-foreground" />
@@ -201,7 +210,7 @@ export default function ProfilePage() {
 
             <section>
               <h3 className="label-mono mb-4 ml-2">Preferences</h3>
-              <div className="bg-white dark:bg-card border border-border rounded-[2.5rem] overflow-hidden">
+              <div className="bg-white dark:bg-card shadow-soft rounded-[2.5rem] overflow-hidden">
                 {[
                   { icon: Bell, label: "Notifications", sub: "Control your alerts" },
                   { icon: CreditCard, label: "Payment Methods", sub: "Manage your cards" },

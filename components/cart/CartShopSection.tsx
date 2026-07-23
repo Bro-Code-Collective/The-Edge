@@ -18,12 +18,12 @@ export function CartShopSection({ shop, items }: { shop: Shop; items: CartEntry[
       layout
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-[2.5rem] border border-border bg-card overflow-hidden"
+      className="rounded-[2.5rem] shadow-soft bg-card overflow-hidden"
     >
       {/* Shop header */}
       <div className="px-6 py-5 bg-secondary/30 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-background grid place-items-center text-2xl border border-border">
+          <div className="w-12 h-12 rounded-2xl bg-background grid place-items-center text-2xl shadow-soft">
             {shop.emoji}
           </div>
           <div>

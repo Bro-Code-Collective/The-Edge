@@ -57,6 +57,28 @@ export default function NotificationsPage() {
     [orders, clearedIds]
   );
 
+  // Mark currently-visible notifications as seen so the unread dot clears once viewed here.
+  useEffect(() => {
+    if (!user?.id || notifications.length === 0) return;
+
+    const key = `edge-seen-notifications-${user.id}`;
+    const saved = localStorage.getItem(key);
+    const seen = new Set<string>(saved ? JSON.parse(saved) : []);
+    let changed = false;
+
+    notifications.forEach((order) => {
+      if (!seen.has(order.id)) {
+        seen.add(order.id);
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      localStorage.setItem(key, JSON.stringify([...seen]));
+      window.dispatchEvent(new Event("edge-seen-notifications-updated"));
+    }
+  }, [user?.id, notifications]);
+
   const handleClearAll = () => {
     persistClearedIds(new Set([...clearedIds, ...notifications.map((order) => order.id)]));
   };
@@ -127,7 +149,7 @@ export default function NotificationsPage() {
           </div>
           <button
             onClick={handleClearAll}
-            className="pill border border-border px-4 py-2 text-sm font-bold focus-dashed hover:bg-secondary transition-colors shrink-0"
+            className="pill shadow-soft px-4 py-2 text-sm font-bold focus-dashed hover:bg-secondary transition-colors shrink-0"
           >
             Clear all
           </button>
@@ -143,7 +165,7 @@ export default function NotificationsPage() {
                 {group.orders.map((order) => (
                   <div
                     key={order.id}
-                    className="group relative flex items-center justify-between gap-4 rounded-3xl border border-border bg-card p-5 transition-colors hover:border-muted-foreground/50"
+                    className="group relative flex items-center justify-between gap-4 rounded-3xl border border-transparent shadow-soft bg-card p-5 transition-colors hover:border-muted-foreground/50"
                   >
                     <Link
                       href={`/order/${encodeURIComponent(order.referenceNumber)}`}

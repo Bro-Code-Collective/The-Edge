@@ -61,7 +61,7 @@ export function AddToCartModal({
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", damping: 32, stiffness: 320 }}
-            className="fixed inset-x-0 bottom-0 sm:inset-0 sm:m-auto z-50 w-full sm:max-w-3xl sm:h-fit sm:max-h-[85vh] max-h-[65vh] bg-card rounded-t-[2rem] sm:rounded-[2rem] border border-border overflow-hidden flex flex-col"
+            className="fixed inset-x-0 bottom-0 sm:inset-0 sm:m-auto z-50 w-full sm:max-w-3xl sm:h-fit sm:max-h-[85vh] max-h-[65vh] bg-card rounded-t-[2rem] sm:rounded-[2rem] shadow-elevated overflow-hidden flex flex-col"
           >
             <div className="flex items-center justify-end sm:justify-start px-5 pt-5 sm:px-8 sm:pt-8 shrink-0">
               <button
@@ -158,7 +158,7 @@ export function AddToCartModal({
                   <div className="border-t border-border pt-5">
                     <div className="flex items-center justify-between">
                       <h3 className="text-base font-bold">Quantity</h3>
-                      <div className="inline-flex items-center rounded-full bg-secondary border border-border overflow-hidden">
+                      <div className="inline-flex items-center rounded-full bg-secondary shadow-soft overflow-hidden">
                         <button
                           type="button"
                           onClick={() => setQty((q) => Math.max(1, q - 1))}

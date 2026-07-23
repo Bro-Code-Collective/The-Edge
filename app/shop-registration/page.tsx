@@ -113,7 +113,7 @@ export default function ShopRegistrationPage() {
           <Link href="/profile" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8">
             <ArrowLeft className="w-4 h-4" /> Back to profile
           </Link>
-          <div className="rounded-3xl border border-border bg-card p-6 sm:p-8">
+          <div className="rounded-3xl shadow-soft bg-card p-6 sm:p-8">
             <div className="w-14 h-14 rounded-2xl bg-primary/10 grid place-items-center mb-5">
               <Lock className="w-7 h-7 text-primary" />
             </div>
@@ -160,7 +160,7 @@ export default function ShopRegistrationPage() {
           <p className="text-muted-foreground leading-relaxed">
             Your shop registration for <strong>{form.shopName}</strong> is pending manual admin approval.
           </p>
-          <div className="mt-8 rounded-3xl border border-border bg-card p-6 text-left space-y-3">
+          <div className="mt-8 rounded-3xl shadow-soft bg-card p-6 text-left space-y-3">
             <div className="label-mono mb-2">What happens next</div>
             {[
               "Admins review the request in Supabase",
@@ -194,7 +194,7 @@ export default function ShopRegistrationPage() {
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <section className="rounded-3xl border border-border bg-card p-6 space-y-5">
+          <section className="rounded-3xl shadow-soft bg-card p-6 space-y-5">
             <h2 className="font-semibold tracking-tight flex items-center gap-2">
               <Store className="w-4 h-4 text-primary" /> Shop information
             </h2>
@@ -273,7 +273,7 @@ export default function ShopRegistrationPage() {
             </div>
           </section>
 
-          <section className="rounded-3xl border border-border bg-card p-6 space-y-5">
+          <section className="rounded-3xl shadow-soft bg-card p-6 space-y-5">
             <h2 className="font-semibold tracking-tight">Owner information</h2>
             <div>
               <label className="label-mono mb-2 block" htmlFor="ownerName">Full name</label>
